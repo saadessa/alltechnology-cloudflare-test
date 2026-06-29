@@ -1,0 +1,242 @@
+---
+title: "Cloud and DevOps Guide: Infrastructure, CI/CD, and Platform Engineering"
+description: "A durable guide to cloud infrastructure, CI/CD pipelines, containers, observability, and platform engineering decisions for teams shipping and operating production software."
+category: "cloud-devops"
+tags:
+  - "cloud DevOps"
+  - "CI/CD"
+  - "Kubernetes"
+  - "platform engineering"
+author: "Jordan Reed"
+publishedAt: "2026-07-09"
+updatedAt: "2026-07-09"
+image: "/images/posts/software.svg"
+featured: true
+trending: false
+draft: false
+faqs:
+  - question: "When should a team adopt Kubernetes?"
+    answer: "When you have multiple services needing independent deploy and scaling, dedicated platform capacity to operate clusters, and pain that simpler container hosting or PaaS cannot solve — not because Kubernetes is industry standard on Hacker News."
+  - question: "What belongs in CI versus CD?"
+    answer: "CI validates every change: build, test, lint, security scan. CD deploys artifacts that passed CI to environments — with approvals and promotion rules between staging and production."
+  - question: "How do you choose a cloud provider?"
+    answer: "Match regional presence, managed services you actually need, team experience, and egress or support costs — not logo familiarity. Multi-cloud is rarely day-one; portable architecture is."
+  - question: "What is platform engineering in practice?"
+    answer: "An internal team providing golden paths — templates, CI modules, observability defaults, and self-service deploy — so product engineers ship without becoming cluster admins."
+  - question: "How much observability is enough?"
+    answer: "Enough to answer: is the service up, which requests fail, why they fail, and what changed recently — with alerts that wake humans only for user-impacting conditions."
+---
+
+## Introduction
+
+We have migrated services that gained reliability from disciplined CI/CD and clusters that cost more than the product revenue they supported. Cloud and DevOps are not goals — they are means to deploy safely, recover fast, and spend predictably.
+
+This guide covers infrastructure choices, pipeline design, containers, observability, and platform engineering patterns that remain valid across vendor marketing cycles.
+
+## Key takeaways
+
+- CI must be fast and trusted — a red main branch stops the whole team.
+- Deploy artifacts, not branches — immutable builds promoted through environments.
+- PaaS and managed services beat self-managed Kubernetes for most early-stage products.
+- Infrastructure as code is the source of truth — console clicks drift and disappear in audits.
+- Observability: metrics for aggregates, logs for incidents, traces for cross-service latency.
+- Platform engineering internalizes golden paths — optional escape hatches for edge cases.
+- Cost visibility is operational responsibility — untagged resources multiply silently.
+
+## Who is this guide for?
+
+- Developers deploying their first production service to cloud
+- Small teams outgrowing single-server deploy scripts
+- Tech leads designing CI/CD before microservice split
+- Platform engineers defining internal templates and guardrails
+- Teams evaluating Kubernetes vs PaaS vs serverless for the next growth phase
+
+## When should you NOT use this?
+
+- **Local-only tools with no deploy target** — library authors need package publish, not Kubernetes.
+- **Kubernetes because resume-driven development** — operational tax without scaling need drains product time.
+- **Multi-cloud day one** — abstraction cost before single-cloud patterns are understood.
+- **Replacing architecture with more infrastructure** — split services before buying bigger clusters.
+- **Full platform team at five engineers** — golden paths can start as documented templates and shared GitHub Actions.
+
+## Cloud provider selection
+
+| Criterion | Evaluate by |
+|-----------|-------------|
+| **Region latency** | Where users and compliance require data |
+| **Managed services used** | Postgres, object storage, queues, identity — not every service catalog item |
+| **Team familiarity** | Ramp time vs marginal feature advantage |
+| **Egress and storage cost** | Media-heavy products: model before commit |
+| **Support and SLA** | Business hours vs 24/7 production |
+
+Portable design: containerized apps, standard SQL, S3-compatible object storage, twelve-factor config — reduces lock-in without running three clouds simultaneously.
+
+## CI/CD pipeline anatomy
+
+```text
+Push / PR
+  ↓
+Lint + typecheck + unit tests (parallel)
+  ↓
+Integration tests (DB container)
+  ↓
+Build immutable artifact (container image or bundle)
+  ↓
+Security scan (deps, image, SAST)
+  ↓
+Deploy staging (auto on main)
+  ↓
+Smoke tests
+  ↓
+Production (manual approval or progressive)
+```
+
+| Stage | Fail fast rule |
+|-------|----------------|
+| PR | Block merge on test/lint failure |
+| Main | Block deploy if integration fails |
+| Production | Rollback trigger if error rate SLO burns |
+
+**Artifact immutability:** same image/tag promoted staging → prod — never rebuild without new commit.
+
+For web app deploy patterns including static and ISR routes, see [Next.js App Router production guide](/en/posts/nextjs-guide-app-router-production).
+
+## Containers and orchestration
+
+| Hosting model | Choose when | Trade-off |
+|---------------|-------------|-----------|
+| **PaaS (Fly, Render, managed App Service)** | Small team, few services | Less control, faster ops |
+| **Single VM + Docker Compose** | Internal tools, staging | Manual scaling |
+| **Kubernetes** | Many services, custom networking, team to operate | Steep ops curve |
+| **Serverless functions** | Spiky, short tasks | Cold start, vendor limits |
+
+Kubernetes checklist before adopting:
+
+- [ ] Multiple services need independent deploy cadence
+- [ ] Horizontal pod autoscaling solves measured load pain
+- [ ] Dedicated engineer time for cluster upgrades and security patches
+- [ ] Budget for managed control plane or accepted ops burden
+
+If two checks fail, stay on PaaS longer.
+
+## Infrastructure as code
+
+Terraform, Pulumi, or cloud-native tools — pick one per org and standardize modules.
+
+| Practice | Why |
+|----------|-----|
+| Modules per environment pattern | DRY without one giant state file |
+| Remote state with locking | Prevent concurrent apply corruption |
+| Plan on PR | Review infra changes like code |
+| Separate state per blast radius | Network vs app vs data tiers |
+
+Never hotfix production in console without backporting to IaC — drift becomes mystery outages.
+
+## Observability stack
+
+| Signal | Tool class | Primary question |
+|--------|------------|------------------|
+| **Metrics** | Prometheus, CloudWatch, Datadog | Is error rate elevated? |
+| **Logs** | Loki, ELK, Cloud Logging | What happened to request X? |
+| **Traces** | OpenTelemetry, Jaeger | Where did latency accumulate? |
+
+Alert on symptoms users feel — error rate, saturation, latency SLO — not CPU > 80% alone without context.
+
+Runbooks linked from alert pages: dashboard, recent deploys, rollback command, escalation contact.
+
+## Platform engineering golden paths
+
+Internal platform delivers:
+
+- **Service template** — repo scaffold with CI, Dockerfile, health check, metrics endpoint
+- **Environment promotion** — documented path dev → staging → prod
+- **Secrets pattern** — how apps receive credentials
+- **Documentation** — request path diagram, on-call basics
+
+Product teams opt in to golden path; exceptions require platform review — not shadow infra.
+
+## Real-world use cases
+
+### Startup on managed PaaS
+
+GitHub Actions builds Docker image → push registry → PaaS deploy hook → health check → Slack notify. Database managed Postgres. No cluster ops.
+
+### Growth phase CI split
+
+PR job: lint/test 8 min. Nightly: full E2E. Main: deploy staging auto; prod button with approval.
+
+### Kubernetes after monolith split
+
+Extract notifications worker; HPA on queue depth; shared Helm chart; platform team owns cluster upgrades.
+
+### Cost anomaly response
+
+Tag all resources by team/service; weekly report; alert on 30% week-over-week spend delta untagged.
+
+### Incident rollback
+
+One-click previous image deploy; feature flag kill switch; postmortem template within 48 hours.
+
+## Best practices
+
+1. **Trunk-based development with green main** — fix or revert fast.
+2. **Promote artifacts, not configs per env** — env vars differ, build does not.
+3. **Secrets via manager** — inject at runtime; rotate on schedule.
+4. **Health and readiness probes** — orchestrators route traffic correctly.
+5. **Backup and restore tested** — untested backup is wishful thinking.
+6. **Document deploy and rollback** — every service owner can execute.
+7. **Tag cloud resources** — cost and ownership attribution.
+
+## Common pitfalls
+
+### Snowflake servers
+
+Manual SSH changes untracked. Pets, not cattle — rebuild from IaC.
+
+### CI without caching
+
+15-minute PR feedback; developers batch commits. Cache dependencies and build layers.
+
+### Production credentials in CI logs
+
+Mask secrets; never echo env in debug steps.
+
+### Alert fatigue
+
+100 Slack alerts daily ignored. Tune to SLO-based paging.
+
+### Kubernetes without monitoring
+
+Cluster runs; apps OOM silently. Metrics and logs day one.
+
+### Skipping staging
+
+Direct prod deploy — rollback becomes default deploy strategy.
+
+## Decision checklist
+
+- [ ] CI runs lint, test, build on every PR with clear merge gates
+- [ ] Deployable artifact immutable and tagged per commit
+- [ ] Staging environment mirrors prod auth and critical integrations
+- [ ] Production deploy has rollback procedure tested this quarter
+- [ ] Infrastructure defined in version-controlled IaC
+- [ ] Secrets not in git; rotation process documented
+- [ ] Metrics, logs, and traces available for production services
+- [ ] Alerts tied to user-impacting SLOs with runbooks
+- [ ] Cloud resources tagged for cost allocation
+- [ ] Hosting choice documented with revisit triggers (traffic, team size)
+- [ ] Backup restore exercised annually minimum
+- [ ] Platform template or documented golden path for new services
+
+## Related articles
+
+- [Next.js App Router guide: production patterns](/en/posts/nextjs-guide-app-router-production) — deploy modes, ISR, and hosting fit for web apps
+- [Cybersecurity guide for developers](/en/posts/cybersecurity-guide-developers) — securing CI, secrets, and cloud IAM
+- [Developer tools guide: workflow optimization](/en/posts/developer-tools-guide-workflow-optimization) — local-to-CI toolchain alignment
+- [Automation guide for technical teams](/en/posts/automation-guide-technical-teams) — workflow glue around deploy and ops events
+
+## Conclusion
+
+Cloud and DevOps excellence is boring pipelines, observable services, and infrastructure you can reproduce from code. Choose the smallest hosting model that meets reliability needs; grow into Kubernetes when pain is measured, not anticipated.
+
+Invest in CI trust, deploy repeatability, and runbooks before exotic architecture. Operations should accelerate product delivery — not become the product.

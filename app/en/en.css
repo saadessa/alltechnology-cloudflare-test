@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.locale-en {
+  direction: ltr;
+  text-align: left;
+  font-family: var(--font-space), system-ui, sans-serif;
+}
+
+.locale-en .prose-tech {
+  direction: ltr;
+  text-align: left;
+}
+
+.locale-en .prose-tech ul,
+.locale-en .prose-tech ol {
+  padding-right: 0;
+  padding-left: 1.5rem;
+}
+
+.locale-en .prose-tech li {
+  padding-right: 0;
+  padding-left: 0.5rem;
+}
+
+.locale-en .prose-tech blockquote {
+  direction: ltr;
+  text-align: left;
+  border-right: 0;
+  border-left: 4px solid theme("colors.brand");
+}
+
+.locale-en .prose-tech th {
+  text-align: left;
+}
+
+.locale-en .prose-tech td {
+  text-align: left;
+}
+
+.locale-en .prose-table-scroll__viewport {
+  direction: ltr;
+}
+
+.locale-en .en-hero {
+  background-image:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(20, 184, 166, 0.06), transparent 38%);
+}
+
+.dark .locale-en .en-hero {
+  background-image:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(20, 184, 166, 0.1), transparent 38%);
+}
+
+.locale-en .en-chip {
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}

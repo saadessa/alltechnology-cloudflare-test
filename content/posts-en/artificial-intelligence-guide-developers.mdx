@@ -1,0 +1,233 @@
+---
+title: "Artificial Intelligence for Developers: Concepts, Models, and Applied Use"
+description: "An engineering-focused guide to artificial intelligence for developers — covering LLMs, embeddings, RAG, fine-tuning trade-offs, evaluation, and how to ship reliable AI features in production software."
+category: "emerging-technology"
+tags:
+  - "artificial intelligence"
+  - "LLM"
+  - "RAG"
+  - "machine learning"
+author: "Maya Chen"
+publishedAt: "2026-07-04"
+updatedAt: "2026-07-04"
+image: "/images/posts/future.svg"
+featured: true
+trending: false
+draft: false
+faqs:
+  - question: "What should a software developer understand about AI before building features?"
+    answer: "Understand that LLMs predict text — they do not know facts. Know the difference between prompting, retrieval (RAG), and fine-tuning, how to evaluate output quality, and where human review and guardrails belong in your pipeline."
+  - question: "When is RAG better than fine-tuning?"
+    answer: "RAG is better when knowledge changes frequently, you need citations, or you lack training data and ML ops capacity. Fine-tuning fits stable domains with large labeled datasets and strict output format requirements."
+  - question: "Do developers need to train models from scratch?"
+    answer: "Almost never for application development. Use hosted APIs or open weights via inference providers. Training from scratch is for research labs and specialized ML teams with data and compute at scale."
+  - question: "How do you know if an AI feature is good enough to ship?"
+    answer: "Define task-specific evaluation sets, measure accuracy and failure modes on real inputs, run red-team tests for safety issues, and set up production monitoring for drift, latency, and cost — not demo impressions."
+  - question: "What is the biggest misconception about AI in software?"
+    answer: "That intelligence implies reliability. Models can be fluent and wrong simultaneously. Production AI is an engineering discipline of constraints, evaluation, and fallbacks — not plug-and-play magic."
+---
+
+## Introduction
+
+Most application developers do not need a PhD in machine learning. They need a clear map: what models do, where they fail, and which techniques — prompting, retrieval, fine-tuning, agents — apply to which product problems. We have shipped AI features that died in demos and features that held up for years; the difference was never the brand on the model API.
+
+This guide explains artificial intelligence from a developer's bench: LLMs, embeddings, RAG, fine-tuning decisions, evaluation discipline, and the production patterns that keep AI features maintainable.
+
+## Key takeaways
+
+- LLMs generate likely text; factual correctness requires grounding, retrieval, or verification — not bigger prompts alone.
+- RAG adds your data at query time; fine-tuning changes model behavior — different problems, different tools.
+- Embeddings power search and retrieval; chunking and metadata matter as much as the model.
+- Evaluation must be task-specific with held-out real inputs — benchmark scores do not predict your product.
+- Cost and latency are architecture inputs; model choice is a product decision.
+- Safety is systems engineering: input filters, output validation, logging, and human escalation.
+
+## Who is this guide for?
+
+- Software engineers adding AI to an existing web or mobile product
+- Backend developers integrating LLM APIs for the first time
+- Technical founders making build-vs-buy decisions on AI infrastructure
+- Teams evaluating RAG vs fine-tuning for a documentation or support feature
+- Developers who understand APIs but not transformers, embeddings, or training pipelines
+
+## When should you NOT use this?
+
+- **Training foundation models from scratch** — this guide covers application AI, not pre-training infrastructure.
+- **Pure computer vision or speech research** — focus here is language-model application patterns common in software products.
+- **Buying AI for hype without a defined user task** — if you cannot name the input, output, and failure cost, stop before choosing a model.
+- **Replacing deterministic business logic with an LLM** — tax calculation, access control, and billing rules belong in code.
+- **Skipping evaluation because "GPT is smart enough"** — that path ships confident wrong answers.
+
+## LLMs: what developers actually need to know
+
+A large language model maps a sequence of tokens to a predicted next token — repeated until a stop condition. It encodes patterns from training data; it does not query a database of facts at inference time unless you build that layer.
+
+| Concept | Practical meaning |
+|---------|-----------------|
+| **Context window** | Maximum tokens in one request — input + output. Long docs must be chunked or summarized. |
+| **Temperature** | Randomness. Low for extraction and code; higher for brainstorming — never "fix" bad prompts with temperature alone. |
+| **System prompt** | Instructions and policy layer — keep stable, versioned, and tested. |
+| **Structured output** | JSON schema or tool mode — use when downstream code parses the response. |
+| **Hallucination** | Plausible false content — expect it; design verification, not surprise. |
+
+### Hosted API vs self-hosted weights
+
+| Criterion | Hosted API | Self-hosted inference |
+|-----------|------------|----------------------|
+| Time to first feature | Days | Weeks (infra + ops) |
+| Data residency control | Contract-dependent | You control hardware |
+| Ops burden | Low | GPU capacity, scaling, patching |
+| Cost at low volume | Often cheaper | Often expensive idle GPUs |
+| Cost at very high volume | Negotiate enterprise | Can win with utilization |
+
+Most product teams start hosted; revisit self-hosting when volume, privacy, or unit economics justify dedicated inference.
+
+## Embeddings and retrieval
+
+Embeddings are dense vectors representing text meaning. Similar texts map to nearby vectors — enabling semantic search over your documents.
+
+**Production retrieval pipeline:**
+
+1. Chunk documents (500–1,500 tokens typical; overlap 10–20%)
+2. Attach metadata (source, date, product area, access level)
+3. Embed chunks; store in vector index with metadata filters
+4. At query time: embed question → retrieve top-k → optional rerank → pass to LLM as context
+
+| Chunking mistake | Symptom | Fix |
+|------------------|---------|-----|
+| Chunks too large | Diluted relevance, context overflow | Smaller chunks + parent doc link |
+| Chunks too small | Lost semantics | Merge by section headers |
+| No metadata filters | Wrong tenant or stale doc retrieved | Filter by ACL and version |
+| No reranking | Near-miss chunks pollute answer | Cross-encoder or LLM rerank top 20 → use top 5 |
+
+## RAG vs fine-tuning vs prompting
+
+| Technique | Changes what | Best for | Weak for |
+|-----------|--------------|----------|----------|
+| **Prompting** | Instructions per request | Format, tone, task framing | Large knowledge bases, private data at scale |
+| **RAG** | Context injected per request | Docs, support, internal wikis | Changing model reasoning style deeply |
+| **Fine-tuning** | Model weights | Stable domain, fixed output schema | Facts that change weekly without retraining |
+
+**Decision shortcut:** knowledge updates often → RAG. Behavior/style stable with thousands of examples → consider fine-tuning. Everything else → prompt engineering and tools first.
+
+## Evaluation and quality
+
+Ship criteria we use before any AI feature goes GA:
+
+1. **Golden set** — 50–200 real user inputs with expected properties (not always exact text)
+2. **Automated checks** — JSON validity, required fields, citation presence, toxicity filters
+3. **Human review sample** — weekly on production traffic sample
+4. **Regression on prompt/model changes** — same golden set, compare diff
+
+| Metric | Measures | Misuse |
+|--------|----------|--------|
+| Exact match | Identical output | Too strict for creative tasks |
+| LLM-as-judge | Rubric scoring | Judge bias; use human spot checks |
+| Task success rate | User completed goal | Needs product analytics wiring |
+| Latency p95 | Response time | Ignore at your UX peril |
+| Cost per task | Tokens × price | Track by feature flag and cohort |
+
+## Production architecture patterns
+
+```text
+Client
+  ↓
+API gateway (auth, rate limit)
+  ↓
+Orchestrator (prompt template v3, model router)
+  ↓
+Retrieval service (optional RAG)
+  ↓
+Model provider
+  ↓
+Output validator (schema, policy)
+  ↓
+Log + metrics (prompt hash, latency, tokens)
+```
+
+Model router: send simple queries to smaller/cheaper models; reserve large models for complex steps. Not every call needs your most capable endpoint.
+
+## Real-world use cases
+
+### Documentation Q&A
+
+RAG over versioned docs; metadata filter by product version; cite chunk sources in UI; fallback "I don't know" when retrieval score below threshold.
+
+### Support draft assistant
+
+Retrieve similar resolved tickets; draft reply; human agent edits and sends. No auto-send until quality metrics stable.
+
+### Code explanation internal tool
+
+Retrieve symbol definitions from indexed repo; explain in context; read-only — no write tools without separate security review.
+
+### Classification and routing
+
+Small model or fine-tuned classifier routes tickets to teams — often cheaper and more stable than a general LLM for labels alone.
+
+### Structured data extraction
+
+Invoice PDF → JSON fields with schema validation; human review queue for low-confidence extractions.
+
+## Best practices
+
+1. **Ground claims** — RAG, tools, or verification; never trust fluent ungrounded answers for facts.
+2. **Version prompts** — treat like code; review changes; run golden sets.
+3. **Validate outputs in code** — schema, allowlists, max lengths.
+4. **Log prompts and responses** — redact PII; retain for debugging and audit.
+5. **Design fallbacks** — degraded mode when model or retrieval fails.
+6. **Right-size the model** — capability vs cost per task type.
+7. **Separate dev and prod keys** — quota and cost isolation.
+
+## Common pitfalls
+
+### RAG without chunk strategy testing
+
+Garbage retrieval → confident wrong answers worse than no AI. Test retrieval precision before tuning prompts.
+
+### Fine-tuning to memorize facts
+
+Facts drift; retraining is slow. Put facts in retrieval or database; fine-tune behavior.
+
+### No output validation
+
+Downstream code crashes on malformed JSON or executes unsafe suggestions.
+
+### Single global prompt for all tasks
+
+One prompt optimizes nothing well. Task-specific templates with shared policy layer.
+
+### Ignoring latency budgets
+
+Users abandon features above sensible p95 for the context (inline assist vs background job).
+
+### Evaluation only on happy paths
+
+Adversarial and empty inputs expose production failures demos hide.
+
+## Decision checklist
+
+- [ ] User task defined with acceptable failure mode
+- [ ] Chosen technique: prompt / RAG / fine-tune / agent — with written rationale
+- [ ] Model selected for latency, cost, and capability fit — not hype
+- [ ] Retrieval chunking and metadata tested if using RAG
+- [ ] Golden evaluation set created from real inputs
+- [ ] Output validation and fallbacks implemented
+- [ ] Auth and rate limits on AI endpoints
+- [ ] Logging with redaction and retention policy
+- [ ] Human review path for high-stakes outputs
+- [ ] Cost monitoring and alerts per feature
+- [ ] Kill switch to disable AI path without full deploy rollback
+- [ ] Prompt and model version tracked in traces
+
+## Related articles
+
+- [AI agents explained: architecture and production patterns](/en/posts/ai-agents-guide-architecture-tools) — when to move from single calls to agent loops
+- [AI coding guide for developers](/en/posts/ai-coding-guide-developers) — applying LLMs in editor and CI workflows
+- [The complete guide to AI tools for developers and teams](/en/posts/ai-tools-guide-developers-teams) — vendor and stack selection
+
+## Conclusion
+
+Artificial intelligence in application development is integration engineering: models are components with strengths, failure modes, and costs. Prompting, retrieval, fine-tuning, and agents are levers on different parts of the problem — not interchangeable buzzwords.
+
+Build evaluation first, keep facts in systems you control, and treat every model output as provisional until your validators and users confirm it. That discipline outlasts any single model generation.

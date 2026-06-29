@@ -1,0 +1,233 @@
+---
+title: "Cybersecurity Guide for Developers: Threats, Defenses, and Secure SDLC"
+description: "A developer-focused cybersecurity guide covering OWASP risks, authentication, secure coding, secrets management, supply chain security, and incident response for application teams."
+category: "cybersecurity"
+tags:
+  - "cybersecurity"
+  - "secure coding"
+  - "application security"
+  - "DevSecOps"
+author: "Jordan Reed"
+publishedAt: "2026-07-07"
+updatedAt: "2026-07-07"
+image: "/images/posts/security.svg"
+featured: true
+trending: false
+draft: false
+faqs:
+  - question: "What security responsibilities do application developers have?"
+    answer: "Developers implement auth correctly, validate input, avoid leaking secrets, keep dependencies patched, and design features so common attacks fail — even without a dedicated security team reviewing every line."
+  - question: "Is security only the security team's job?"
+    answer: "No. Security teams set policy and run assessments; developers write the code attackers exploit. Secure SDLC integrates checks into design, code review, CI, and deploy — not a scan thrown over the wall at release."
+  - question: "What is the highest-impact security fix for most web apps?"
+    answer: "Authentication and authorization bugs — broken access control — plus injection flaws. Fix session handling, enforce server-side authz on every sensitive action, and parameterize database queries."
+  - question: "How often should dependencies be updated for security?"
+    answer: "Continuous monitoring with automated PRs for patches; critical CVEs patched within days, not quarters. Lockfiles and SBOM export make this auditable."
+  - question: "Do AI-generated code paths need different security review?"
+    answer: "Same bar as human code — plus attention to new dependencies, hallucinated crypto, and prompt injection if user input reaches an LLM with tool access. See our AI coding guide for workflow guardrails."
+---
+
+## Introduction
+
+We have triaged breaches that started with a missing auth check on one API route, a secret in a public repo, and a dependency two years out of date — not sophisticated nation-state exploits. Application security is mostly discipline on fundamentals that developers control daily.
+
+This guide maps threats developers actually face, defenses that work in production codebases, and how to embed security into design, review, CI, and response without stopping delivery entirely.
+
+## Key takeaways
+
+- Broken access control and injection remain top risks — verify authz server-side on every sensitive path.
+- Secrets belong in secret managers, never in git — scan commits and CI for leaks.
+- Dependencies are attack surface — automate patch PRs and review major upgrades.
+- Security headers and HTTPS are baseline, not optional hardening.
+- LLM features add prompt injection and data leakage risks — treat user content as hostile.
+- Incident response starts with logging, ownership, and practiced runbooks — not panic.
+- Security is proportional — prioritize assets by impact and likelihood.
+
+## Who is this guide for?
+
+- Full-stack and backend developers shipping internet-facing applications
+- Tech leads writing secure coding standards for a growing team
+- DevOps engineers integrating security scans into CI/CD
+- Teams without a dedicated AppSec function who still need a defensible posture
+- Developers adding AI features who must understand new attack surfaces
+
+## When should you NOT use this?
+
+- **Air-gapped embedded systems with separate threat models** — physical access and firmware signing dominate; web patterns are insufficient alone.
+- **Replacing legal/compliance programs** — SOC 2 and GDPR need policy and process beyond code patterns.
+- **Penetration test report item-by-item without prioritization** — fix critical exploitable paths first, not every informational finding.
+- **Security theater** — checkbox scans without fixing findings waste time and create false confidence.
+- **Blocking all delivery for theoretical risks** — risk-based prioritization keeps security sustainable.
+
+## Threat model for application developers
+
+Think in assets, entry points, and trust boundaries.
+
+| Asset | Typical entry point | Developer-controlled defense |
+|-------|---------------------|------------------------------|
+| User accounts | Login, password reset, OAuth | Strong session handling, MFA option, rate limits |
+| Private data | API routes, GraphQL resolvers | Server-side authz, field-level checks |
+| Admin functions | Hidden URLs, role flags | RBAC enforced in code, not UI alone |
+| Infrastructure | CI tokens, cloud API keys | Secret manager, least-privilege IAM |
+| Code integrity | Dependencies, build pipeline | Lockfiles, signed commits, SAST in CI |
+
+**Trust rule:** never trust client-side checks, hidden form fields, or JWT claims without server validation against current user state.
+
+## OWASP-aligned priorities for builders
+
+Focus engineering effort where exploitation impact is highest.
+
+| Risk class | Developer action |
+|------------|------------------|
+| **Broken access control** | Test horizontal/vertical privilege escalation on every new endpoint |
+| **Injection** | Parameterized queries; sanitize or encode output contextually |
+| **Cryptographic failures** | Use library defaults (TLS, bcrypt/argon2); never roll your own crypto |
+| **Insecure design** | Threat sketch in design doc for auth, payments, PII features |
+| **Security misconfiguration** | Harden defaults; disable debug in prod; restrict CORS deliberately |
+| **Vulnerable components** | Dependabot or equivalent; block merge on critical CVE |
+| **Authentication failures** | Secure cookies, rotation, logout everywhere, credential stuffing limits |
+| **Software/data integrity** | Verify package sources; protect CI secrets |
+| **Logging failures** | Log security events without logging passwords or tokens |
+| **SSRF** | Validate outbound URLs from server-side fetchers |
+
+## Authentication and session security
+
+| Decision | Safer pattern | Weaker pattern |
+|----------|---------------|----------------|
+| Session storage | HttpOnly, Secure, SameSite cookies | localStorage JWT accessible to XSS |
+| Token lifetime | Short access + refresh rotation | Long-lived bearer in URL |
+| Logout | Server invalidates session | Client deletes cookie only |
+| Password storage | Argon2id or bcrypt with per-user salt | Plaintext or reversible encryption |
+| OAuth | Validate state param; pin redirect URIs | Open redirects after login |
+
+Multi-factor authentication on admin and high-value accounts is baseline for B2B products — not a premium feature.
+
+## Input validation and output encoding
+
+Validate on server; treat all input as hostile — including JSON bodies, headers, and file uploads.
+
+| Context | Defense |
+|---------|---------|
+| SQL | Parameterized queries or ORM; never string concat |
+| HTML output | Context-aware encoding or framework auto-escape |
+| Shell commands | Avoid shell; use exec with argument arrays |
+| File paths | Allowlist paths; reject `..` traversal |
+| XML/XXE | Disable external entities in parsers |
+
+Upload limits: size, MIME sniffing, virus scan for user-facing file storage; store outside web root.
+
+## Secrets and configuration
+
+| Secret type | Store in | Never in |
+|-------------|----------|----------|
+| API keys | Secret manager / env injected at runtime | Git, client bundles |
+| DB passwords | Managed rotation service | docker-compose committed |
+| CI credentials | OIDC to cloud where possible | Long-lived PAT in repo secrets without rotation |
+
+Run secret scanners on pre-commit and CI. Rotate immediately on leak — revocation, not hope.
+
+## Supply chain and CI security
+
+- **Lockfiles** committed; CI installs from lockfile only
+- **SBOM** export for release artifacts when customers require it
+- **Signed commits** or protected branches on main
+- **Minimal CI permissions** — read-only default; deploy role only on release job
+- **Third-party GitHub Actions** pinned to SHA, not floating `@v1`
+
+Review new dependencies: maintenance status, download stats anomalies, typosquatting on package names.
+
+## AI-specific security notes
+
+Products using LLMs face additional paths:
+
+- **Prompt injection** — user content instructing model to ignore policy or exfiltrate data
+- **Tool abuse** — agents calling tools with escalated scope
+- **Training data leakage** — sending secrets or PII in prompts to consumer APIs
+- **Insecure generated code** — weak crypto snippets, SQL string concat
+
+Mitigations align with our [AI coding guide](/en/posts/ai-coding-guide-developers): review all AI output, least-privilege tools, no secrets in prompts, human gates on destructive actions.
+
+## Real-world use cases
+
+### API authz audit on new feature
+
+Checklist on every route: authenticate, authorize resource ownership, audit log sensitive reads, rate limit brute force.
+
+### Dependency CVE fire drill
+
+Automated PR bumps patch version; integration tests run; deploy within SLA; postmortem if exploit window was public.
+
+### Secrets leak response
+
+Revoke key in cloud console, rotate all related credentials, scan git history, notify if external exposure confirmed.
+
+### Pre-launch security headers
+
+CSP, HSTS, X-Content-Type-Options, frame ancestors — verified in staging with securityheaders.com or equivalent scan.
+
+### LLM support bot hardening
+
+User message sanitized; retrieval filtered by tenant; no tool access to admin APIs; escalation to human on policy triggers.
+
+## Best practices
+
+1. **Authz on server for every mutation and sensitive read** — UI hiding is not security.
+2. **Parameterized data access** — no exceptions for "quick" admin queries.
+3. **Rotate and scope secrets** — short-lived credentials where cloud supports it.
+4. **Security in code review checklist** — auth, input, secrets, dependencies on risky PRs.
+5. **Automate patch PRs** — humans merge, bots detect CVEs.
+6. **Log auth failures and admin actions** — with retention and alert thresholds.
+7. **Practice incident runbooks** — table top twice a year minimum.
+
+## Common pitfalls
+
+### JWT in localStorage for XSS-vulnerable SPAs
+
+One XSS steals token. Prefer HttpOnly cookies with CSRF protection for cookie-based sessions.
+
+### CORS `*` with credentials
+
+Misconfigured cross-origin access. Explicit allowlist only.
+
+### Security by obscurity on admin routes
+
+`/admin` unauthenticated — scanners find it in hours. Real auth required.
+
+### Ignoring dependency dev tree
+
+Dev dependency CVE in CI pipeline can compromise builds. Scan all trees.
+
+### Verbose error messages to clients
+
+Stack traces reveal framework versions and paths. Generic client message; detail in server logs.
+
+### Skipping authz tests
+
+Unit test happy path only; IDOR ships to production.
+
+## Decision checklist
+
+- [ ] Threat sketch completed for features handling PII, payments, or admin actions
+- [ ] Server-side authorization on all sensitive endpoints verified
+- [ ] Passwords hashed with modern algorithm; sessions use secure cookie flags
+- [ ] Input validation on server for all external input sources
+- [ ] SQL access parameterized; no dynamic query concat
+- [ ] Secrets in manager; scanners run on CI
+- [ ] Dependencies monitored; critical CVE SLA defined
+- [ ] Security headers configured and verified in staging
+- [ ] CI uses least privilege; third-party actions pinned
+- [ ] Security events logged with appropriate retention
+- [ ] Incident runbook with contacts and revocation steps documented
+- [ ] AI features reviewed for injection and data leakage if applicable
+
+## Related articles
+
+- [AI coding guide for developers](/en/posts/ai-coding-guide-developers) — secure workflows for AI-assisted code changes
+- [AI agents explained: architecture and production patterns](/en/posts/ai-agents-guide-architecture-tools) — securing tool-using agent systems
+- [Modern software engineering guide](/en/posts/modern-software-engineering-guide) — secure SDLC within broader engineering practice
+
+## Conclusion
+
+Application security is executed in pull requests: auth checks, validated input, patched dependencies, and secrets kept out of git. Fancy tools do not compensate for missing fundamentals.
+
+Prioritize by exploitability and asset value. Automate repetition in CI; keep human judgment on design and review. When something breaks, logs and runbooks matter as much as prevention.

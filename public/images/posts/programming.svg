@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <rect x="120" y="120" width="960" height="390" rx="24" fill="#111827"/>
+  <path d="m310 270-80 70 80 70M890 270l80 70-80 70M540 440l120-220" stroke="#93c5fd" stroke-width="28" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="90" y="570" font-family="Arial" font-size="64" font-weight="700" fill="#111827">Programming</text>
+</svg>

@@ -1,0 +1,236 @@
+---
+title: "Modern Software Engineering Guide: Languages, Patterns, and Practices"
+description: "A durable guide to modern software engineering — covering architecture trade-offs, API design, testing strategy, code review, technical debt, and team practices that survive production scale."
+category: "programming"
+tags:
+  - "software engineering"
+  - "programming"
+  - "architecture"
+  - "best practices"
+author: "Elena Patel"
+publishedAt: "2026-07-05"
+updatedAt: "2026-07-05"
+image: "/images/posts/programming.svg"
+featured: true
+trending: false
+draft: false
+faqs:
+  - question: "What distinguishes modern software engineering from just writing code?"
+    answer: "Modern software engineering emphasizes maintainability, testability, observable systems, incremental delivery, and explicit trade-offs — not only making features work on a developer machine."
+  - question: "Should new projects start with microservices?"
+    answer: "Usually no. Start with a modular monolith with clear boundaries. Split services when team scale, deployment independence, or load isolation justify the operational cost."
+  - question: "How much testing is enough?"
+    answer: "Enough to change code without fear: strong unit tests on business logic, integration tests on critical paths, and selective E2E on revenue-impacting flows. Coverage percentage alone is not a goal."
+  - question: "When is technical debt worth taking?"
+    answer: "When the decision is explicit, time-bounded, and tracked — usually to validate a market hypothesis or meet a hard deadline. Untracked debt becomes permanent friction."
+  - question: "How do code review standards scale with team size?"
+    answer: "Small teams rely on informal review; growing teams need written standards, review SLAs, and ownership boundaries so reviews stay thorough without blocking delivery entirely."
+---
+
+## Introduction
+
+We have joined greenfield projects that shipped fast and collapsed under change, and legacy systems that looked grim but improved steadily with disciplined engineering. The difference was rarely language choice — it was whether the team made trade-offs explicit, tested what mattered, and kept boundaries clear as the codebase grew.
+
+This guide collects software engineering practices that remain valid across framework cycles: how to structure applications, design APIs, test proportionally, run code review, and manage debt without pretending it does not exist.
+
+## Key takeaways
+
+- Optimize for change — code is read and modified more than it is written.
+- Modular monolith first; microservices when organizational or scaling pain is real.
+- APIs are contracts — versioning and error shapes matter as much as features.
+- Test behavior that protects revenue and data; do not chase coverage theater.
+- Code review is quality control and knowledge transfer — standards must be written.
+- Technical debt is a loan; track it like one or it never gets repaid.
+- Observability is a feature — you cannot operate what you cannot see.
+
+## Who is this guide for?
+
+- Mid-level developers moving toward senior ownership of features and systems
+- Tech leads establishing team conventions on a growing codebase
+- Founding engineers defining architecture before headcount scales
+- Teams refactoring a monolith or recovering from fast MVP debt
+- Developers who know syntax but want durable engineering judgment
+
+## When should you NOT use this?
+
+- **Throwaway prototypes with a one-week life** — over-engineering wastes time; ship and discard.
+- **Solved niche domains with mandated stacks** — regulated embedded firmware has different rules than web SaaS.
+- **Solo scripts and personal automation** — many practices here add overhead without return.
+- **Replacing product discovery with architecture** — no pattern saves a product users do not want.
+- **Applying every practice on day one** — adopt practices as pain appears, not preemptively all at once.
+
+## Architecture: monolith, modules, and services
+
+| Signal | Favor modular monolith | Favor separate services |
+|--------|------------------------|-------------------------|
+| Team size | Under ~15 engineers on one product | Multiple autonomous teams per domain |
+| Deploy needs | Single coordinated release OK | Independent deploy cadence required |
+| Load profile | Uniform scaling | One subsystem dominates resources |
+| Data coupling | Strong transactions across features | Clear bounded contexts with loose coupling |
+
+**Modular monolith pattern:** one deployable unit, internal packages or folders with enforced import rules (lint boundaries). Extract a service when you repeatedly fight deploy coupling or need different scaling — not because diagrams look cleaner.
+
+### Layering that survives refactors
+
+| Layer | Responsibility | Depends on |
+|-------|----------------|------------|
+| **Domain / core** | Business rules, entities | Nothing external |
+| **Application** | Use cases, orchestration | Domain |
+| **Infrastructure** | DB, HTTP, queues, email | Application interfaces |
+| **Interface** | HTTP handlers, CLI, UI | Application |
+
+Keep domain logic free of framework imports where practical — tests stay fast and migrations hurt less.
+
+## API design for long-lived clients
+
+Public APIs outlive internal refactors. Decisions that age well:
+
+- **Stable error shape** — machine-readable code, human message, optional details field
+- **Pagination cursors** — not offset-only on large tables
+- **Explicit versioning** — URL or header; never silent breaking changes
+- **Idempotency keys** — on POST that creates billable or side-effect resources
+- **Documentation generated from schema** — OpenAPI from types, not hand-written drift
+
+| Client need | API design response |
+|-------------|---------------------|
+| Mobile on flaky network | Retry-safe idempotency, concise payloads |
+| Third-party integrators | Long deprecation windows, changelog |
+| Internal frontend | BFF optional; do not leak raw DB shapes |
+
+## Testing strategy
+
+The testing pyramid is a budget allocation, not a religion.
+
+| Layer | Target | Skip when |
+|-------|--------|-----------|
+| **Unit** | Pure logic, edge cases, parsers | Testing framework internals |
+| **Integration** | DB queries, API handlers, auth | Duplicating unit-covered pure functions |
+| **E2E** | Checkout, signup, critical workflows | Every CRUD screen — too slow and flaky |
+
+**Rule we enforce:** every production bug gets a test at the lowest level that catches it — prevents recurrence cheaper than E2E alone.
+
+Flaky tests are deleted or fixed immediately. A flaky suite trains teams to ignore red builds.
+
+## Code review as engineering policy
+
+Effective review checks:
+
+1. Correctness — does it do what the ticket says?
+2. Tests — are behavior changes covered?
+3. Security — authz, input validation, secrets
+4. Operability — logs, metrics, feature flags for risky paths
+5. Maintainability — naming, scope, duplication
+
+| Review anti-pattern | Fix |
+|---------------------|-----|
+| Style-only nitpicks without linter | Automate formatting; focus human time on design |
+| Rubber-stamp LGTM | Rotate reviewers; require checklist on risky areas |
+| 500-line PRs | Author splits work; reviewer caps review size |
+| No written standards | `CONTRIBUTING.md` with examples |
+
+## Technical debt management
+
+Debt is intentional shortcuts. Track in tickets linked to areas of code with estimated interest (slowdown per sprint).
+
+| Debt type | Example | Repayment trigger |
+|-----------|---------|-------------------|
+| **Deliberate** | Ship MVP without caching | User load hits threshold |
+| **Accidental** | Wrong abstraction discovered | Touch area 3+ times for features |
+| **Bit rot** | Deprecated dependency | Security advisory or hire onboarding pain |
+
+Schedule 10–20% capacity for repayment when debt measurably slows delivery — not as a vague "cleanup sprint" that never ships.
+
+## Observability and operations
+
+Minimum viable observability for web services:
+
+- **Structured logs** — request ID, user ID (hashed), route, latency
+- **Metrics** — error rate, latency histograms, queue depth
+- **Traces** — distributed trace on cross-service calls when split
+- **Alerts** — on SLO burn, not on every error log line
+
+Developers who write the feature own the dashboards for its golden signals — not a separate silo "ops team" on small products.
+
+## Real-world use cases
+
+### SaaS feature in a modular monolith
+
+New billing feature in `billing/` package; imports only through public index; integration tests on invoice creation; feature flag for rollout; metrics on payment failure rate.
+
+### Public API versioning
+
+v1 frozen; v2 adds fields; sunset v1 with 12-month notice; contract tests in CI from OpenAPI spec.
+
+### Legacy module recovery
+
+Characterization tests before refactor; extract pure functions; delete dead paths; document remaining debt ticket.
+
+### Monolith extraction
+
+Extract notifications service only after queue-backed async pattern already works in-process — proves boundary before ops multiply.
+
+### Onboarding acceleration
+
+`ARCHITECTURE.md` plus recorded walkthrough of request path; review checklist in PR template; pairing on first two tickets.
+
+## Best practices
+
+1. **Make boundaries explicit** — packages, modules, or services with documented APIs.
+2. **Automate formatting and lint** — humans review design, not tabs.
+3. **Write ADRs for irreversible decisions** — one page: context, decision, consequences.
+4. **Ship behind flags** — risky changes reversible without redeploy drama.
+5. **Prefer boring technology** — proven databases and queues over novelty.
+6. **Review for security on auth and data paths** — every time, not when remembered.
+7. **Measure lead time and incident rate** — engineering health metrics, not vanity counts.
+
+## Common pitfalls
+
+### Distributed system too early
+
+Network partitions and deployment choreography before product-market fit. Operate one thing well first.
+
+### Anemic domain model
+
+All logic in handlers — untestable, duplicated. Push rules into domain layer.
+
+### Testing implementation details
+
+Brittle tests break on refactor without catching real bugs. Assert outcomes and public behavior.
+
+### Infinite abstraction
+
+Frameworks on frameworks; three indirections to read a database row. Match complexity to problem size.
+
+### Ignoring deprecation
+
+Breaking internal APIs without migration path — every consumer hacks around until collapse.
+
+### Hero culture on incidents
+
+Fix without postmortem and systemic fix — same outage repeats.
+
+## Decision checklist
+
+- [ ] Architecture choice documented with expected team size and deploy model
+- [ ] Module boundaries enforceable (lint or package rules)
+- [ ] Public APIs versioned with error contract defined
+- [ ] Tests cover new behavior and one regression path for bugs
+- [ ] Code review checklist used on auth, payments, and data export
+- [ ] Feature flags or rollback path for risky releases
+- [ ] Structured logging with correlation ID on request paths
+- [ ] Dashboards or alerts for primary success and failure metrics
+- [ ] Technical debt tickets filed when shortcuts taken deliberately
+- [ ] Dependencies scanned for known vulnerabilities in CI
+- [ ] Documentation updated when architecture or API changes
+- [ ] Onboarding path exists for new engineers on the codebase
+
+## Related articles
+
+- [Next.js App Router guide: production patterns](/en/posts/nextjs-guide-app-router-production) — applying these practices on a modern web stack
+- [AI coding guide for developers](/en/posts/ai-coding-guide-developers) — integrating AI assistants without abandoning review discipline
+
+## Conclusion
+
+Modern software engineering is judgment under constraints: ship value, keep the system changeable, and make trade-offs visible. Patterns come and go; clear boundaries, proportional testing, honest debt tracking, and operational visibility compound over years.
+
+Start simpler than you think. Add complexity when pain is measured — not when architecture diagrams look impressive in a slide deck.

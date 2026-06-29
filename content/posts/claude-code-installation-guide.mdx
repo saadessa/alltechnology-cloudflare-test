@@ -1,0 +1,421 @@
+---
+title: "تثبيت Claude Code: دليل التثبيت على Windows و macOS و Linux 2026"
+description: "دليل كامل لتثبيت Claude Code على Windows و macOS و Linux في 2026. طرق التثبيت عبر npm و Homebrew و WinGet، متطلبات التشغيل، وحل مشاكل التثبيت الشائعة"
+category: "artificial-intelligence"
+tags:
+  - "Claude Code"
+  - "تثبيت Claude Code"
+  - "البرمجة بالذكاء الاصطناعي"
+  - "أدوات المطورين"
+  - "Anthropic"
+  - "npm"
+  - "Homebrew"
+author: "technical-expert"
+publishedAt: "2026-06-28"
+updatedAt: "2026-06-28"
+image: "/images/posts/claude-code-installation-guide.webp"
+featured: false
+draft: false
+faqs:
+  - question: "ما هي متطلبات تثبيت Claude Code؟"
+    answer: "تحتاج إلى Node.js الإصدار 18 أو أحدث، Git الإصدار 2.38 أو أحدث، واتصال بالإنترنت. كما تحتاج حساب Claude (Pro أو Max) للاستخدام."
+  - question: "كيف أثبت Claude Code على Windows؟"
+    answer: "يمكنك التثبيت عبر npm: npm install -g @anthropic-ai/claude-code، أو عبر WinGet: winget install Anthropic.ClaudeCode، أو عبر المثبت الرسومي من موقع Claude الرسمي."
+  - question: "كيف أثبت Claude Code على macOS؟"
+    answer: "يمكنك التثبيت عبر npm: npm install -g @anthropic-ai/claude-code، أو عبر Homebrew: brew install --cask claude-code، أو عبر المثبت الرسومي."
+  - question: "كيف أثبت Claude Code على Linux؟"
+    answer: "استخدم npm: npm install -g @anthropic-ai/claude-code. تأكد من تثبيت Node.js و Git أولاً. قد تحتاج إلى صلاحيات إضافية حسب توزيعة Linux."
+  - question: "كيف أتأكد من نجاح تثبيت Claude Code؟"
+    answer: "شغل الأمر claude --version في الطرفية. إذا ظهر رقم الإصدار، التثبيت تم بنجاح. ثم جرب claude login لتسجيل الدخول."
+---
+
+# تثبيت Claude Code: دليل التثبيت على Windows و macOS و Linux 2026
+
+قبل أن تبدأ في استخدام Claude Code، تحتاج إلى تثبيته على جهازك. هذه العملية بسيطة وتستغرق بضع دقائق فقط.
+
+هذا الدليل يغطي جميع طرق تثبيت Claude Code على أنظمة التشغيل المختلفة: Windows و macOS و Linux.
+
+للتعرف على Claude Code بشكل عام، يمكنك قراءة المقالة الرئيسية [Claude Code: الدليل الشامل للمبتدئين والمحترفين في 2026](/posts/claude-code-guide-2026).
+
+---
+
+## متطلبات التشغيل الأساسية
+
+قبل تثبيت Claude Code، تأكد من توفر هذه المتطلبات:
+
+### البرامج المطلوبة
+
+1. **Node.js:** الإصدار 18 أو أحدث
+   - حمله من [nodejs.org](https://nodejs.org)
+   - تأكد من التثبيت بـ `node --version`
+
+2. **Git:** الإصدار 2.38 أو أحدث
+   - حمله من [git-scm.com](https://git-scm.com)
+   - تأكد من التثبيت بـ `git --version`
+
+3. **اتصال بالإنترنت:** للتواصل مع خوادم Anthropic
+
+### الحساب المطلوب
+
+- **حساب Claude:** اشتراك Pro أو Max
+- **طريقة الدخول:** يمكن استخدام حساب Claude، API Key، Amazon Bedrock، أو Google Vertex AI
+
+---
+
+## طرق تثبيت Claude Code
+
+### الطريقة الأولى: عبر npm (الموصى بها لجميع الأنظمة)
+
+هذه هي الطريقة الأكثر شيوعاً وتعمل على جميع أنظمة التشغيل.
+
+**الخطوات:**
+
+1. افتح الطرفية (Terminal):
+   - **Windows:** Command Prompt أو PowerShell
+   - **macOS:** Terminal
+   - **Linux:** Terminal
+
+2. شغل الأمر التالي:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+3. انتظر حتى يكتمل التثبيت (قد يستغرق دقيقة أو دقيقتين)
+
+4. تحقق من التثبيت:
+
+```bash
+claude --version
+```
+
+> **⚠️ تنبيه مهم:** لا تستخدم `sudo` مع npm مهما كان النظام. هذا يسبب مشاكل في صلاحيات الملفات لاحقاً.
+
+---
+
+### الطريقة الثانية: عبر Homebrew (macOS)
+
+إذا كنت تستخدم macOS وتفضل Homebrew، يمكنك التثبيت بهذه الطريقة.
+
+**الخطوات:**
+
+1. تأكد من تثبيت Homebrew على جهازك:
+
+```bash
+brew --version
+```
+
+2. شغل الأمر التالي:
+
+```bash
+brew install --cask claude-code
+```
+
+3. تحقق من التثبيت:
+
+```bash
+claude --version
+```
+
+---
+
+### الطريقة الثالثة: عبر WinGet (Windows)
+
+لمستخدمي Windows الذين يفضلون WinGet.
+
+**الخطوات:**
+
+1. افتح PowerShell
+
+2. شغل الأمر التالي:
+
+```bash
+winget install Anthropic.ClaudeCode
+```
+
+3. تحقق من التثبيت:
+
+```bash
+claude --version
+```
+
+---
+
+### الطريقة الرابعة: عبر المثبت الرسومي (macOS و Windows)
+
+إذا كنت تفضل واجهة رسومية بدلاً من سطر الأوامر.
+
+**الخطوات:**
+
+1. اذهب إلى [claude.com/download](https://claude.com/download)
+
+2. اختر نظام التشغيل الخاص بك:
+   - **macOS:** حمل ملف `.dmg`
+   - **Windows:** حمل ملف `.exe`
+
+3. افتح المثبت واتبع التعليمات
+
+4. بعد التثبيت، افتح الطرفية وتحقق:
+
+```bash
+claude --version
+```
+
+---
+
+## تثبيت Claude Code على أنظمة التشغيل المختلفة
+
+### تثبيت Claude Code على Windows
+
+**الخيار 1: عبر npm (موصى به)**
+
+1. ثبّت Node.js من [nodejs.org](https://nodejs.org)
+2. افتح Command Prompt كمسؤول
+3. شغل: `npm install -g @anthropic-ai/claude-code`
+4. تحقق: `claude --version`
+
+**الخيار 2: عبر WinGet**
+
+1. افتح PowerShell
+2. شغل: `winget install Anthropic.ClaudeCode`
+3. تحقق: `claude --version`
+
+**الخيار 3: عبر المثبت الرسومي**
+
+1. حمل من [claude.com/download](https://claude.com/download)
+2. شغل المثبت واتبع التعليمات
+
+---
+
+### تثبيت Claude Code على macOS
+
+**الخيار 1: عبر npm (موصى به)**
+
+1. ثبّت Node.js من [nodejs.org](https://nodejs.org)
+2. افتح Terminal
+3. شغل: `npm install -g @anthropic-ai/claude-code`
+4. تحقق: `claude --version`
+
+**الخيار 2: عبر Homebrew**
+
+1. افتح Terminal
+2. شغل: `brew install --cask claude-code`
+3. تحقق: `claude --version`
+
+**الخيار 3: عبر المثبت الرسومي**
+
+1. حمل من [claude.com/download](https://claude.com/download)
+2. افتح ملف `.dmg` واسحب Claude Code إلى مجلد التطبيقات
+
+---
+
+### تثبيت Claude Code على Linux
+
+**الخيار 1: عبر npm (الطريقة الوحيدة)**
+
+1. ثبّت Node.js من [nodejs.org](https://nodejs.org) أو عبر مدير الحزم:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install nodejs npm
+   
+   # Fedora
+   sudo dnf install nodejs
+   ```
+
+2. ثبّت Git:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt install git
+   
+   # Fedora
+   sudo dnf install git
+   ```
+
+3. شغل npm:
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+4. تحقق: `claude --version`
+
+> **⚠️ تنبيه:** لا تستخدم `sudo` مع npm. إذا ظهرت مشكلة صلاحيات، استخدم مدير الحزم لتصحيحها.
+
+---
+
+## تسجيل الدخول إلى Claude Code
+
+بعد التثبيت، تحتاج إلى تسجيل الدخول لبدء الاستخدام.
+
+**الخطوات:**
+
+1. في الطرفية، شغل:
+
+```bash
+claude login
+```
+
+2. اتبع التعليمات:
+   - سيُفتح متصفحك لتسجيل الدخول بحساب Claude
+   - وافق على الطلب في المتصفح
+   - عد إلى الطرفية
+
+3. تحقق من تسجيل الدخول:
+
+```bash
+claude
+```
+
+إذا ظهرت رسالة ترحيب، فأنت جاهز للبدء.
+
+---
+
+## طرق المصادقة البديلة
+
+### عبر API Key
+
+إذا كان لديك مفتاح API من Anthropic:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+claude
+```
+
+### عبر Amazon Bedrock
+
+```bash
+export CLAUDE_CODE_USE_BEDROCK=1
+claude
+```
+
+### عبر Google Vertex AI
+
+```bash
+export CLAUDE_CODE_USE_VERTEX=1
+claude
+```
+
+---
+
+## التحقق من التثبيت
+
+بعد التثبيت، تأكد من أن كل شيء يعمل بشكل صحيح:
+
+### 1. التحقق من الإصدار
+
+```bash
+claude --version
+```
+
+يجب أن يظهر رقم الإصدار (مثال: 1.0.0)
+
+### 2. التحقق من الأوامر الأساسية
+
+```bash
+claude --help
+```
+
+يجب أن تظهر قائمة بالأوامر المتاحة.
+
+### 3. تجربة جلسة بسيطة
+
+```bash
+claude
+```
+
+ثم اكتب:
+
+> "اكتب دالة بلغة JavaScript تقوم بطباعة Hello World"
+
+إذا حصلت على رد، التثبيت يعمل بشكل صحيح.
+
+---
+
+## مشاكل التثبيت الشائعة وحلولها
+
+### مشكلة: "command not found: claude"
+
+**السبب:** لم يتم تثبيت Claude Code بشكل صحيح، أو أن المسار غير مضاف إلى PATH.
+
+**الحل:**
+
+1. تأكد من التثبيت بـ `npm install -g @anthropic-ai/claude-code`
+2. أعد تشغيل الطرفية
+3. إذا استمرت المشكلة، أعد تثبيت Node.js
+
+### مشكلة: "npm: command not found"
+
+**السبب:** Node.js غير مثبت على جهازك.
+
+**الحل:** ثبّت Node.js من [nodejs.org](https://nodejs.org)
+
+### مشكلة: "EACCES: permission denied"
+
+**السبب:** مشكلة صلاحيات عند استخدام npm.
+
+**الحل:** لا تستخدم `sudo` أبداً. بدلاً من ذلك:
+- على macOS/Linux: استخدم مدير الحزم أو ثبّت Node.js عبر nvm
+- على Windows: شغل Command Prompt كمسؤول
+
+### مشكلة: "brew command not found" (macOS)
+
+**السبب:** Homebrew غير مثبت.
+
+**الحل:** ثبّت Homebrew من [brew.sh](https://brew.sh)
+
+### مشكلة: "winget command not found" (Windows)
+
+**السبب:** WinGet غير مثبت أو غير محدث.
+
+**الحل:** استخدم npm بدلاً من ذلك، أو حدث WinGet عبر Microsoft Store.
+
+---
+
+## تحديث Claude Code
+
+لتحديث Claude Code إلى أحدث إصدار:
+
+```bash
+npm update -g @anthropic-ai/claude-code
+```
+
+أو:
+
+```bash
+npm install -g @anthropic-ai/claude-code@latest
+```
+
+---
+
+## إلغاء تثبيت Claude Code
+
+إذا أردت إلغاء تثبيت Claude Code:
+
+```bash
+npm uninstall -g @anthropic-ai/claude-code
+```
+
+---
+
+## الخلاصة
+
+تثبيت Claude Code عملية بسيطة تستغرق بضع دقائق. اختر الطريقة المناسبة لنظام التشغيل الخاص بك.
+
+**الخلاصة في 5 نقاط:**
+
+- تحتاج Node.js 18+ و Git 2.38+
+- الطريقة الموصى بها: `npm install -g @anthropic-ai/claude-code`
+- لا تستخدم `sudo` أبداً
+- تحقق من التثبيت بـ `claude --version`
+- سجل الدخول بـ `claude login` لبدء الاستخدام
+
+بعد التثبيت، أنت جاهز لاستخدام Claude Code في مشاريعك. ابدأ بأمر بسيط واكتشف قوة هذه الأداة.
+
+---
+
+## اقرأ أيضاً
+
+- [Claude Code: الدليل الشامل للمبتدئين والمحترفين في 2026](/posts/claude-code-guide-2026)
+- [شرح Claude Code للمبتدئين: دليل كامل لخطواتك الأولى](/posts/claude-code-beginners-guide)
+- [Claude Code مع VS Code: التكامل والإعدادات الكاملة](/posts/claude-code-vscode-integration)
+- [أوامر Claude Code الأساسية: دليل سريع للمبرمجين](/posts/claude-code-commands-guide)

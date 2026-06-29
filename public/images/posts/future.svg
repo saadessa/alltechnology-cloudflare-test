@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <path d="M220 440c170-260 590-260 760 0" stroke="#111827" stroke-width="24" fill="none" stroke-linecap="round"/>
+  <circle cx="600" cy="300" r="120" fill="#dbeafe" stroke="#2563eb" stroke-width="18"/>
+  <circle cx="600" cy="300" r="36" fill="#14b8a6"/>
+  <text x="90" y="570" font-family="Arial" font-size="64" font-weight="700" fill="#111827">Future Tech</text>
+</svg>
