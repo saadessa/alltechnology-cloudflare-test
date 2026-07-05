@@ -1,0 +1,470 @@
+
+---
+title: "GPT-5 API Guide: دليل المطور الشامل 2026"
+description: "الدليل الشامل لاستخدام GPT-5 API في 2026. تعرف على كيفية الحصول على مفتاح API، إرسال الطلبات، معالجة الاستجابات، إدارة التكاليف، وأفضل الممارسات للمطورين"
+category: "artificial-intelligence"
+tags:
+  - "GPT-5 API"
+  - "OpenAI API"
+  - "مطورين"
+  - "الذكاء الاصطناعي"
+  - "برمجة"
+  - "API"
+author: "technical-expert"
+publishedAt: "2026-07-03"
+updatedAt: "2026-07-03"
+image: "/images/posts/gpt-5-api-guide.webp"
+featured: false
+trending: false
+draft: false
+faqs:
+  - question: "كيف أحصل على مفتاح API لـ GPT-5؟"
+    answer: "للحصول على مفتاح API لـ GPT-5، تحتاج إلى حساب في OpenAI. اذهب إلى platform.openai.com، سجل الدخول، ثم انتقل إلى قسم 'API Keys' وأنشئ مفتاحاً جديداً. تأكد من أن حسابك مدعوم برصيد أو اشتراك مدفوع للوصول إلى GPT-5."
+  - question: "كم تكلفة استخدام GPT-5 API؟"
+    answer: "تكلفة GPT-5 API تتراوح بين 5-10 دولار لكل مليون رمز إدخال (Input) و 15-30 دولار لكل مليون رمز إخراج (Output)، حسب الطلب والتعقيد. الأسعار قابلة للتغيير، ويُنصح بمراجعة صفحة التسعير الرسمية من OpenAI للحصول على أحدث الأسعار."
+  - question: "هل يمكن استخدام GPT-5 API مجاناً؟"
+    answer: "لا توجد نسخة مجانية من GPT-5 API حالياً. تقدم OpenAI رصيداً مجانياً للمطورين الجدد (عادة 5-10 دولار)، لكن بعد انتهاء الرصيد، تحتاج إلى الدفع. يمكنك استخدام النماذج المجانية مثل GPT-4o mini للتجربة بتكلفة أقل."
+  - question: "ما هي حدود معدل الطلبات (Rate Limits) في GPT-5 API؟"
+    answer: "حدود معدل الطلبات تعتمد على خطة الاشتراك. عادةً، تتراوح بين 10-100 طلب في الدقيقة (RPM) و 50,000-500,000 رمز في الدقيقة (TPM) حسب المستوى. يمكنك طلب زيادة الحدود عبر التواصل مع فريق OpenAI."
+  - question: "كم عدد اللغات التي يدعمها GPT-5 API؟"
+    answer: "يدعم GPT-5 API أكثر من 60 لغة، بما في ذلك العربية والإنجليزية والصينية والفرنسية والإسبانية والألمانية واليابانية والكورية وغيرها. يمكنك تحديد اللغة التي تريد الرد بها عبر التعليمات في الطلب."
+---
+
+# GPT-5 API Guide: دليل المطور الشامل 2026
+
+GPT-5 API هو الأداة التي تتيح للمطورين دمج أقوى نموذج لغوي من OpenAI في تطبيقاتهم وخدماتهم. سواء كنت تبني روبوت محادثة، أداة تحليل بيانات، أو تطبيق ذكاء اصطناعي متقدم، فإن GPT-5 API يمنحك القوة التي تحتاجها.
+
+في هذا الدليل، سنستعرض كل ما تحتاج معرفته لاستخدام GPT-5 API: من الحصول على المفتاح إلى إرسال الطلبات ومعالجة الاستجابات وإدارة التكاليف.
+
+للحصول على نظرة شاملة عن GPT-5، يمكنك قراءة المقالة الرئيسية [ما هو GPT-5؟ الدليل الشامل للإصدار الأحدث](/posts/what-is-gpt-5). للتعرف على الميزات الجديدة، اقرأ [ميزات GPT-5 الجديدة: الدليل الكامل](/posts/gpt-5-new-features).
+
+---
+
+## ما هو GPT-5 API؟
+
+GPT-5 API هو واجهة برمجة تطبيقات (Application Programming Interface) تتيح للمطورين الوصول إلى نموذج GPT-5 عبر الإنترنت. بدلاً من استخدام واجهة ChatGPT، يمكنك دمج GPT-5 في تطبيقك الخاص.
+
+**الاستخدامات الشائعة:**
+
+- بناء روبوتات محادثة مخصصة
+- تحليل البيانات وإنشاء التقارير
+- توليد المحتوى تلقائياً
+- الترجمة واللغويات
+- البرمجة المساعدة
+- البحث والتحليل العميق
+
+---
+
+## المتطلبات الأساسية
+
+قبل البدء في استخدام GPT-5 API، تأكد من توفر هذه المتطلبات:
+
+- **حساب OpenAI:** سجل في [platform.openai.com](https://platform.openai.com)
+- **مفتاح API:** أنشئ مفتاحاً في لوحة التحكم
+- **رصيد أو اشتراك:** تأكد من وجود رصيد كافٍ (النسخة المجانية لا تدعم GPT-5)
+- **بيئة تطوير:** Python، Node.js، أو أي لغة تدعم طلبات HTTP
+
+---
+
+## خطوات الحصول على مفتاح API
+
+### الخطوة الأولى: إنشاء حساب في OpenAI Platform
+
+1. اذهب إلى [platform.openai.com](https://platform.openai.com)
+2. سجل الدخول باستخدام حساب OpenAI الخاص بك
+3. إذا لم يكن لديك حساب، أنشئ حساباً جديداً
+
+### الخطوة الثانية: الانتقال إلى قسم API Keys
+
+1. في لوحة التحكم، ابحث عن **"API Keys"** في القائمة الجانبية
+2. اضغط على **"Create new secret key"**
+
+### الخطوة الثالثة: إنشاء المفتاح
+
+1. أعطِ المفتاح اسماً وصفياً (مثل "My App Key")
+2. اختر الصلاحيات المطلوبة (عادةً جميع الصلاحيات)
+3. اضغط **"Create secret key"**
+4. انسخ المفتاح فوراً واحفظه في مكان آمن (لن يظهر مرة أخرى)
+
+> ⚠️ **تنبيه:** لا تشارك مفتاح API مع أي شخص. احفظه في متغيرات البيئة (Environment Variables) في تطبيقك.
+
+---
+
+## أول طلب باستخدام Python
+
+### تثبيت المكتبة
+
+```bash
+pip install openai
+```
+
+### الكود الأساسي
+
+```python
+import openai
+
+# تعيين مفتاح API
+openai.api_key = "YOUR_API_KEY"
+
+# إرسال طلب إلى GPT-5
+response = openai.ChatCompletion.create(
+    model="gpt-5",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "ما هي عاصمة فرنسا؟"}
+    ]
+)
+
+# طباعة الرد
+print(response.choices[0].message.content)
+```
+
+### الرد المتوقع
+
+```
+عاصمة فرنسا هي باريس.
+```
+
+---
+
+## أول طلب باستخدام JavaScript (Node.js)
+
+### تثبيت المكتبة
+
+```bash
+npm install openai
+```
+
+### الكود الأساسي
+
+```javascript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+    apiKey: "YOUR_API_KEY"
+});
+
+async function main() {
+    const response = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+            { role: "system", content: "You are a helpful assistant." },
+            { role: "user", content: "ما هي عاصمة فرنسا؟" }
+        ]
+    });
+    console.log(response.choices[0].message.content);
+}
+
+main();
+```
+
+---
+
+## معلمات الطلب الأساسية
+
+| المعلمة | الوصف | مثال |
+|---------|-------|------|
+| **model** | النموذج المستخدم | `"gpt-5"` |
+| **messages** | قائمة الرسائل في المحادثة | `[{role: "user", content: "Hello"}]` |
+| **temperature** | التحكم في العشوائية (0-2) | `0.7` (افتراضي) |
+| **max_tokens** | الحد الأقصى لعدد الرموز المولدة | `1000` |
+| **top_p** | أخذ العينات من النواة (0-1) | `1` (افتراضي) |
+| **frequency_penalty** | عقوبة التكرار (-2 إلى 2) | `0` (افتراضي) |
+| **presence_penalty** | عقوبة الموضوعات الجديدة (-2 إلى 2) | `0` (افتراضي) |
+| **stream** | تمكين التدفق (Streaming) | `true` أو `false` |
+
+---
+
+## مثال متقدم مع جميع المعلمات
+
+```python
+import openai
+
+openai.api_key = "YOUR_API_KEY"
+
+response = openai.ChatCompletion.create(
+    model="gpt-5",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant that speaks Arabic."},
+        {"role": "user", "content": "اكتب مقالاً قصيراً عن الذكاء الاصطناعي."}
+    ],
+    temperature=0.8,
+    max_tokens=500,
+    top_p=0.9,
+    frequency_penalty=0.5,
+    presence_penalty=0.5,
+    stream=False
+)
+
+print(response.choices[0].message.content)
+```
+
+---
+
+## دالة المساعد (System Prompt)
+
+تعد دالة المساعد (System Prompt) من أهم الميزات في GPT-5 API. تحدد هذه الدالة دور النموذج وسلوكه.
+
+**أمثلة على أدوار المساعد:**
+
+```python
+# مساعد رسمي
+{"role": "system", "content": "You are a professional assistant that provides formal and accurate responses."}
+
+# مساعد غير رسمي
+{"role": "system", "content": "You are a friendly and casual assistant that speaks like a friend."}
+
+# مساعد متخصص
+{"role": "system", "content": "You are a Python expert. Provide code examples and explanations."}
+
+# مساعد بالعربية
+{"role": "system", "content": "أنت مساعد ذكي تتحدث العربية الفصحى. قدم إجابات مفصلة ومفيدة."}
+```
+
+---
+
+## تدفق الردود (Streaming)
+
+يتيح التدفق (Streaming) استلام الردود كلمةً كلمة في الوقت الفعلي، مما يحسن تجربة المستخدم.
+
+**مثال باستخدام Python:**
+
+```python
+import openai
+
+openai.api_key = "YOUR_API_KEY"
+
+response = openai.ChatCompletion.create(
+    model="gpt-5",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "اكتب قصة قصيرة."}
+    ],
+    stream=True
+)
+
+for chunk in response:
+    if chunk.choices[0].delta.get("content"):
+        print(chunk.choices[0].delta.content, end="")
+```
+
+---
+
+## إدارة التكاليف
+
+### كيفية حساب التكلفة
+
+تكلفة GPT-5 API تعتمد على عدد الرموز (Tokens) المستخدمة في الإدخال والإخراج.
+
+**الصيغة التقريبية:**
+
+- **الإدخال (Input):** 5-10 دولار لكل مليون رمز
+- **الإخراج (Output):** 15-30 دولار لكل مليون رمز
+
+**مثال:**
+
+طلب يحتوي على 100 رمز إدخال و 200 رمز إخراج:
+
+- الإدخال: 100 / 1,000,000 × 10 = 0.001 دولار
+- الإخراج: 200 / 1,000,000 × 25 = 0.005 دولار
+- **الإجمالي:** 0.006 دولار (أقل من سنت واحد)
+
+### نصائح لتقليل التكلفة
+
+1. **قلل عدد الرموز:** استخدم أوامر مختصرة وواضحة
+2. **استخدم max_tokens:** حدد الحد الأقصى للرموز المولدة
+3. **استخدم نماذج أرخص:** استخدم GPT-4o mini للمهام البسيطة
+4. **خزّن الردود:** خزّن الردود المتكررة لتجنب الطلبات المكررة
+5. **راقب الاستخدام:** استخدم لوحة تحكم OpenAI لمراقبة الاستخدام والتكاليف
+
+---
+
+## حدود معدل الطلبات (Rate Limits)
+
+| الخطة | RPM (طلبات/دقيقة) | TPM (رموز/دقيقة) |
+|-------|-------------------|------------------|
+| **Free Tier** | 3 | 10,000 |
+| **Pay-as-you-go** | 10-100 | 50,000-500,000 |
+| **Enterprise** | مخصص | مخصص |
+
+**كيفية التعامل مع حدود المعدل:**
+
+```python
+import time
+import openai
+
+def call_api_with_retry(messages, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-5",
+                messages=messages
+            )
+            return response
+        except openai.error.RateLimitError:
+            wait_time = 2 ** attempt  # 1, 2, 4 ثوانٍ
+            time.sleep(wait_time)
+    raise Exception("Max retries exceeded")
+```
+
+---
+
+## أفضل الممارسات
+
+### 1. استخدم متغيرات البيئة للمفتاح
+
+```python
+import os
+openai.api_key = os.getenv("OPENAI_API_KEY")
+```
+
+### 2. تعامل مع الأخطاء بشكل مناسب
+
+```python
+import openai
+
+try:
+    response = openai.ChatCompletion.create(
+        model="gpt-5",
+        messages=[{"role": "user", "content": "Hello"}]
+    )
+except openai.error.AuthenticationError:
+    print("مفتاح API غير صحيح")
+except openai.error.RateLimitError:
+    print("تجاوزت حدود المعدل، انتظر قليلاً")
+except openai.error.APIError:
+    print("حدث خطأ في الخادم، حاول مرة أخرى")
+```
+
+### 3. استخدم الإصدارات المحددة من النماذج
+
+```python
+# استخدم إصداراً محدداً لضمان الاتساق
+model = "gpt-5-2025-04"  # مثال على إصدار محدد
+```
+
+### 4. حسّن الأوامر (Prompt Engineering)
+
+- قدم سياقاً واضحاً
+- استخدم أمثلة في الطلب (Few-shot learning)
+- حدد التنسيق المطلوب للرد
+
+---
+
+## أمثلة عملية
+
+### مثال 1: روبوت محادثة بسيط
+
+```python
+import openai
+
+openai.api_key = "YOUR_API_KEY"
+
+def chat_with_gpt5(user_message, history=[]):
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-5",
+        messages=messages,
+        temperature=0.7
+    )
+    
+    assistant_message = response.choices[0].message.content
+    history.append({"role": "user", "content": user_message})
+    history.append({"role": "assistant", "content": assistant_message})
+    
+    return assistant_message, history
+
+# الاستخدام
+history = []
+reply, history = chat_with_gpt5("ما هي عاصمة فرنسا؟", history)
+print(reply)
+```
+
+### مثال 2: تحليل المشاعر
+
+```python
+import openai
+
+openai.api_key = "YOUR_API_KEY"
+
+def analyze_sentiment(text):
+    response = openai.ChatCompletion.create(
+        model="gpt-5",
+        messages=[
+            {"role": "system", "content": "You are a sentiment analysis expert."},
+            {"role": "user", "content": f"حلل المشاعر في هذا النص وأعطِ نتيجة (إيجابي، سلبي، محايد) مع نسبة مئوية:\n\n{text}"}
+        ],
+        temperature=0.3
+    )
+    return response.choices[0].message.content
+
+# الاستخدام
+result = analyze_sentiment("أنا سعيد جداً بهذا المنتج الرائع!")
+print(result)
+```
+
+### مثال 3: تلخيص النصوص
+
+```python
+import openai
+
+openai.api_key = "YOUR_API_KEY"
+
+def summarize_text(text, max_length=100):
+    response = openai.ChatCompletion.create(
+        model="gpt-5",
+        messages=[
+            {"role": "system", "content": "You are a summarization expert."},
+            {"role": "user", "content": f"لخص النص التالي في {max_length} كلمة:\n\n{text}"}
+        ],
+        max_tokens=max_length * 2
+    )
+    return response.choices[0].message.content
+
+# الاستخدام
+long_text = "..."  # نص طويل
+summary = summarize_text(long_text, 150)
+print(summary)
+```
+
+---
+
+## مقارنة GPT-5 API مع نماذج API أخرى
+
+| الميزة | GPT-5 | GPT-4 | Claude | Gemini |
+|--------|-------|-------|--------|--------|
+| **السعر (إدخال)** | 5-10 دولار | 5 دولار | 3-8 دولار | 2-7 دولار |
+| **السعر (إخراج)** | 15-30 دولار | 15 دولار | 15-24 دولار | 10-21 دولار |
+| **السياق** | 1M رمز | 128K رمز | 200K رمز | 2M رمز |
+| **الوسائط المتعددة** | صور، فيديو، صوت | صور | صور | صور، صوت |
+
+---
+
+## الخلاصة
+
+GPT-5 API هو أداة قوية للمطورين لدمج الذكاء الاصطناعي في تطبيقاتهم. مع فهم المعلمات، إدارة التكاليف، واتباع أفضل الممارسات، يمكنك بناء تطبيقات ذكية ومبتكرة.
+
+**الخلاصة في 5 نقاط:**
+
+- GPT-5 API يتطلب مفتاحاً ورصيداً للاستخدام
+- استخدم المعلمات (temperature، max_tokens) للتحكم في الردود
+- تتبع التكاليف عبر مراقبة عدد الرموز المستخدمة
+- تعامل مع الأخطاء وحدود المعدل بشكل مناسب
+- حسّن الأوامر للحصول على أفضل النتائج
+
+ابدأ في استخدام GPT-5 API اليوم وابنِ تطبيقات ذكاء اصطناعي متقدمة.
+
+---
+
+## اقرأ أيضاً
+
+- [دليل ChatGPT الشامل 2026: كل ما تحتاج معرفته](/posts/chatgpt-complete-guide)
+- [ما هو GPT-5؟ الدليل الشامل للإصدار الأحدث](/posts/what-is-gpt-5)
+- [ميزات GPT-5 الجديدة: الدليل الكامل](/posts/gpt-5-new-features)
+- [GPT-5 vs GPT-4: ما الفرق؟](/posts/gpt-5-vs-gpt-4)
+- [كيفية استخدام GPT-5: دليل المبتدئين والمحترفين](/posts/how-to-use-gpt-5)
+
+```
