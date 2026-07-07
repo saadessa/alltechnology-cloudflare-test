@@ -93,6 +93,19 @@ export const authors = [
       "https://www.youtube.com/@saadelfallah"
     ]
   },
+   {
+    slug: "technical-expert",
+    name: "technical-expert",
+    role: "Founder & Tech Author",
+    bio: "كاتب ومحرر تقني متخصص في الذكاء الاصطناعي، البرمجة، الأمن السيبراني، والتقنيات الحديثة.",
+    avatar: "/images/authors/saad-elfallah.webp",
+    sameAs: [
+      "https://www.linkedin.com/in/saad-elfallah-97bb6940/",
+      "https://x.com/googleboos",
+      "https://github.com/saadessa",
+      "https://www.youtube.com/@saadelfallah"
+    ]
+  },
   {
     slug: "maya-chen",
     name: "Maya Chen",
