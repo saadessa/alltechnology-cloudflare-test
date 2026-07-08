@@ -1,0 +1,515 @@
+---
+title: "أفضل إعدادات Continue للمبرمجين: دليل التحسين 2026"
+description: "الدليل الشامل لأفضل إعدادات Continue.dev لتحسين تجربة البرمجة بالذكاء الاصطناعي. تعرف على إعدادات النماذج، السياق، الإكمال التلقائي، اختصارات لوحة المفاتيح، ونصائح لتحقيق أقصى أداء في 2026."
+category: "developer-tools"
+tags:
+  - "Continue.dev"
+  - "الإعدادات"
+  - "البرمجة"
+  - "VS Code"
+  - "الذكاء الاصطناعي"
+  - "أدوات المطورين"
+  - "تحسين الأداء"
+  - "AI Coding"
+author: "technical-expert"
+publishedAt: "2026-07-08"
+updatedAt: "2026-07-08"
+image: "/images/posts/continue-best-settings.webp"
+featured: false
+trending: false
+draft: false
+faqs:
+  - question: "ما هي أفضل إعدادات Continue.dev للبرمجة؟"
+    answer: "أفضل إعدادات Continue.dev تشمل: (1) استخدام نموذج خفيف للإكمال التلقائي (مثل CodeLlama 7B)، (2) نموذج أقوى للمحادثات (مثل DeepSeek-Coder أو GPT-4)، (3) تفعيل سياق الكود الكامل (Full Codebase Context)، (4) تعيين اختصارات لوحة مفاتيح مريحة، (5) تمكين الإكمال التلقائي المتعدد (Multi-line autocomplete)، (6) ضبط حجم السياق المناسب لقوة جهازك."
+  - question: "كيف يمكن تحسين سرعة Continue.dev؟"
+    answer: "لتحسين سرعة Continue.dev: (1) استخدم نموذجاً محلياً عبر Ollama بدلاً من النماذج السحابية، (2) اختر نموذجاً أصغر (7B بدلاً من 13B أو 34B)، (3) قلل حجم السياق (contextLength) في الإعدادات، (4) فعّل تسريع GPU، (5) استخدم نموذجاً خفيفاً للإكمال التلقائي ونموذجاً أكبر للمحادثات فقط، (6) أغلق التطبيقات الأخرى التي تستهلك الذاكرة."
+  - question: "ما هو أفضل نموذج للإكمال التلقائي في Continue؟"
+    answer: "أفضل نموذج للإكمال التلقائي يعتمد على جهازك: (1) CodeLlama 7B للأجهزة المتوسطة، (2) DeepSeek-Coder 6.7B للأداء البرمجي الممتاز، (3) Phi-3 Mini للأجهزة المحدودة، (4) Mistral 7B للسرعة والتوازن. يُنصح بتجربة عدة نماذج واختيار الأنسب من حيث السرعة وجودة الاقتراحات."
+  - question: "كيف يمكن تخصيص اختصارات Continue.dev؟"
+    answer: "لتخصيص اختصارات Continue.dev: (1) في VS Code، اضغط Ctrl+K Ctrl+S لفتح اختصارات لوحة المفاتيح، (2) ابحث عن 'Continue'، (3) عدّل الاختصارات حسب رغبتك، مثل تغيير Ctrl+Shift+L لفتح المحادثة، أو إضافة اختصار لفتح الإكمال المضمن (Inline Chat). يمكنك أيضاً تعديل الاختصارات عبر ملف keybindings.json."
+  - question: "ما هي إعدادات السياق الموصى بها في Continue؟"
+    answer: "إعدادات السياق الموصى بها: (1) فعّل 'codebase' لفهم المشروع بأكمله، (2) فعّل 'terminal' لفهم أخطاء المحطة، (3) فعّل 'docs' لقراءة ملفات README، (4) عيّن 'contextLength' حسب قوة جهازك (2048-4096 للأجهزة المتوسطة، 8192+ للأجهزة القوية)، (5) استخدم 'automaticContext' لتحميل السياق تلقائياً."
+---
+
+# أفضل إعدادات Continue للمبرمجين: دليل التحسين 2026
+
+**Continue.dev** هو مساعد برمجة بالذكاء الاصطناعي مفتوح المصدر وقوي، لكن للحصول على أفضل تجربة، تحتاج إلى تهيئته بشكل صحيح. الإعدادات الصحيحة يمكن أن تزيد من إنتاجيتك بشكل كبير، وتحسن جودة الاقتراحات، وتسرع الاستجابة.
+
+هذا الدليل يقدم لك أفضل إعدادات Continue.dev لتحسين تجربة البرمجة بالذكاء الاصطناعي في 2026.
+
+---
+
+## 1. ملف الإعدادات (config.json)
+
+ملف الإعدادات الرئيسي لـ Continue.dev هو `config.json`. يمكنك الوصول إليه من خلال:
+
+1. فتح Continue في VS Code (أيقونة الشريط الجانبي).
+2. الضغط على أيقونة **الإعدادات** (الترس).
+3. اختيار **"Open Config"**.
+
+---
+
+## 2. إعدادات النماذج (Models)
+
+### 2.1 اختيار النماذج المناسبة
+
+| الاستخدام | النموذج الموصى به | السبب |
+|-----------|-------------------|-------|
+| **الإكمال التلقائي** | CodeLlama 7B أو DeepSeek-Coder 6.7B | خفيف وسريع، اقتراحات جيدة |
+| **المحادثات** | GPT-4 أو Claude أو DeepSeek-Coder 33B | فهم عميق، ردود دقيقة |
+| **التشغيل المحلي** | CodeLlama 7B أو Mistral 7B | مجاني، خاص، سريع |
+
+### 2.2 إعداد نموذجين (خفيف وثقيل)
+
+```json
+{
+  "models": [
+    {
+      "title": "CodeLlama 7B (Autocomplete)",
+      "provider": "ollama",
+      "model": "codellama:7b"
+    },
+    {
+      "title": "DeepSeek-Coder 33B (Chat)",
+      "provider": "ollama",
+      "model": "deepseek-coder:33b"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "CodeLlama 7B",
+    "provider": "ollama",
+    "model": "codellama:7b"
+  }
+}
+```
+
+### 2.3 إعداد النماذج السحابية
+
+```json
+{
+  "models": [
+    {
+      "title": "GPT-4",
+      "provider": "openai",
+      "model": "gpt-4",
+      "apiKey": "YOUR_API_KEY"
+    },
+    {
+      "title": "Claude 3.5 Sonnet",
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "apiKey": "YOUR_ANTHROPIC_API_KEY"
+    }
+  ]
+}
+```
+
+---
+
+## 3. إعدادات الإكمال التلقائي (Autocomplete)
+
+### 3.1 تمكين الإكمال التلقائي المتعدد الأسطر
+
+```json
+{
+  "tabAutocompleteOptions": {
+    "multilineCompletions": "always"
+  }
+}
+```
+
+**الخيارات**:
+- `"always"`: دائماً (موصى به).
+- `"never"`: أبداً.
+- `"auto"`: تلقائي.
+
+### 3.2 ضبط سرعة الإكمال التلقائي
+
+```json
+{
+  "tabAutocompleteOptions": {
+    "debounceDelay": 200,
+    "maxPromptTokens": 1024
+  }
+}
+```
+
+- **debounceDelay**: تأخير قبل عرض الاقتراح (200ms موصى به).
+- **maxPromptTokens**: الحد الأقصى لرموز السياق للإكمال التلقائي (1024-2048).
+
+### 3.3 تخصيص لغة الإكمال التلقائي
+
+يمكنك تحديد لغات برمجة معينة للإكمال التلقائي:
+
+```json
+{
+  "tabAutocompleteOptions": {
+    "language": {
+      "python": true,
+      "javascript": true,
+      "typescript": true,
+      "go": true,
+      "rust": true
+    }
+  }
+}
+```
+
+---
+
+## 4. إعدادات السياق (Context)
+
+### 4.1 تفعيل سياق الكود الكامل
+
+```json
+{
+  "contextProviders": [
+    {
+      "name": "codebase",
+      "params": {
+        "maxTokens": 4096
+      }
+    }
+  ]
+}
+```
+
+### 4.2 تفعيل سياق المحطة الطرفية
+
+```json
+{
+  "contextProviders": [
+    {
+      "name": "terminal",
+      "params": {}
+    }
+  ]
+}
+```
+
+### 4.3 تفعيل سياق المستندات
+
+```json
+{
+  "contextProviders": [
+    {
+      "name": "docs",
+      "params": {
+        "paths": ["README.md", "docs/"]
+      }
+    }
+  ]
+}
+```
+
+### 4.4 ضبط حجم السياق
+
+```json
+{
+  "contextLength": 4096
+}
+```
+
+**التوصيات**:
+- **أجهزة محدودة**: 2048
+- **أجهزة متوسطة**: 4096
+- **أجهزة قوية**: 8192+
+
+### 4.5 تمكين السياق التلقائي
+
+```json
+{
+  "automaticContext": true
+}
+```
+
+---
+
+## 5. اختصارات لوحة المفاتيح (Keybindings)
+
+### 5.1 الاختصارات الافتراضية
+
+| الاختصار (Windows/Linux) | الاختصار (macOS) | الوظيفة |
+|--------------------------|------------------|---------|
+| `Ctrl+Shift+L` | `Cmd+Shift+L` | فتح نافذة المحادثة |
+| `Ctrl+Shift+I` | `Cmd+Shift+I` | فتح محادثة مضمّنة |
+| `Tab` | `Tab` | قبول الاقتراح |
+| `Ctrl+Space` | `Cmd+Space` | عرض اقتراحات إضافية |
+
+### 5.2 تخصيص الاختصارات
+
+لتخصيص الاختصارات:
+
+1. في VS Code، اضغط `Ctrl+K Ctrl+S`.
+2. ابحث عن **"Continue"**.
+3. عدّل الاختصارات حسب رغبتك.
+
+**اختصارات موصى بها**:
+
+```json
+[
+  {
+    "key": "ctrl+shift+c",
+    "command": "continue.openChat"
+  },
+  {
+    "key": "ctrl+shift+i",
+    "command": "continue.inlineChat"
+  },
+  {
+    "key": "ctrl+shift+a",
+    "command": "continue.acceptSuggestion"
+  }
+]
+```
+
+---
+
+## 6. إعدادات المظهر (UI)
+
+### 6.1 تخصيص ألوان الإكمال التلقائي
+
+```json
+{
+  "ui": {
+    "accentColor": "#007ACC",
+    "completionColor": "#6A9955"
+  }
+}
+```
+
+### 6.2 تخصيص حجم الخط
+
+```json
+{
+  "ui": {
+    "fontSize": 14
+  }
+}
+```
+
+---
+
+## 7. إعدادات متقدمة (Advanced)
+
+### 7.1 إعدادات مخصصة للنماذج المحلية
+
+```json
+{
+  "customCommands": [
+    {
+      "name": "explain",
+      "prompt": "اشرح الكود التالي بالتفصيل: {{code}}"
+    },
+    {
+      "name": "test",
+      "prompt": "اكتب اختبارات وحدة للكود التالي باستخدام pytest: {{code}}"
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "fix",
+      "description": "إصلاح الكود",
+      "prompt": "صحح الأخطاء في الكود التالي: {{code}}"
+    }
+  ]
+}
+```
+
+### 7.2 تمكين ميزة التصحيح التلقائي
+
+```json
+{
+  "enableDebug": true
+}
+```
+
+### 7.3 تمكين ميزة الإكمال التلقائي في التعليقات
+
+```json
+{
+  "tabAutocompleteOptions": {
+    "completionsInComments": true
+  }
+}
+```
+
+---
+
+## 8. ملف الإعدادات الكامل (مثال متكامل)
+
+```json
+{
+  "models": [
+    {
+      "title": "CodeLlama 7B (Autocomplete)",
+      "provider": "ollama",
+      "model": "codellama:7b"
+    },
+    {
+      "title": "DeepSeek-Coder 33B (Chat)",
+      "provider": "ollama",
+      "model": "deepseek-coder:33b"
+    },
+    {
+      "title": "GPT-4 (Advanced)",
+      "provider": "openai",
+      "model": "gpt-4",
+      "apiKey": "YOUR_API_KEY"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "CodeLlama 7B",
+    "provider": "ollama",
+    "model": "codellama:7b"
+  },
+  "tabAutocompleteOptions": {
+    "multilineCompletions": "always",
+    "debounceDelay": 200,
+    "maxPromptTokens": 1024,
+    "completionsInComments": true
+  },
+  "contextProviders": [
+    {
+      "name": "codebase",
+      "params": {
+        "maxTokens": 4096
+      }
+    },
+    {
+      "name": "terminal",
+      "params": {}
+    },
+    {
+      "name": "docs",
+      "params": {
+        "paths": ["README.md", "docs/"]
+      }
+    }
+  ],
+  "contextLength": 4096,
+  "automaticContext": true,
+  "ui": {
+    "accentColor": "#007ACC",
+    "completionColor": "#6A9955",
+    "fontSize": 14
+  },
+  "customCommands": [
+    {
+      "name": "explain",
+      "prompt": "اشرح الكود التالي بالتفصيل: {{code}}"
+    },
+    {
+      "name": "test",
+      "prompt": "اكتب اختبارات وحدة للكود التالي باستخدام pytest: {{code}}"
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "fix",
+      "description": "إصلاح الكود",
+      "prompt": "صحح الأخطاء في الكود التالي: {{code}}"
+    }
+  ],
+  "enableDebug": false
+}
+```
+
+---
+
+## 9. نصائح لتحسين الأداء
+
+### 9.1 استخدم النماذج المحلية
+
+النماذج المحلية عبر Ollama أسرع وأكثر خصوصية من النماذج السحابية.
+
+> **للمزيد**: راجع [Continue مع Ollama: التشغيل المحلي](/posts/continue-ollama).
+
+### 9.2 اختر النموذج المناسب لجهازك
+
+| حجم الجهاز | النموذج الموصى به |
+|------------|-------------------|
+| **محدود (8GB RAM)** | Phi-3 Mini أو CodeLlama 7B |
+| **متوسط (16GB RAM)** | CodeLlama 13B أو Mistral 7B |
+| **قوي (32GB+ RAM)** | DeepSeek-Coder 33B أو CodeLlama 34B |
+
+### 9.3 قلل حجم السياق للأجهزة المحدودة
+
+```json
+{
+  "contextLength": 2048
+}
+```
+
+### 9.4 استخدم نموذجين مختلفين
+
+- **نموذج خفيف**: للإكمال التلقائي.
+- **نموذج ثقيل**: للمحادثات.
+
+### 9.5 فعّل تسريع GPU
+
+إذا كان لديك بطاقة رسوميات NVIDIA، تأكد من تثبيت CUDA وتشغيل Ollama مع دعم GPU.
+
+### 9.6 أغلق التطبيقات غير الضرورية
+
+حرر الذاكرة والمعالج لتسريع النماذج المحلية.
+
+---
+
+## 10. حل المشكلات الشائعة في الإعدادات
+
+### 10.1 الإكمال التلقائي لا يعمل
+
+**الحل**:
+1. تأكد من تعيين `tabAutocompleteModel`.
+2. تحقق من اتصال النموذج (Ollama أو API).
+3. تأكد من تفعيل الإكمال التلقائي في الإعدادات.
+
+### 10.2 النموذج بطيء جداً
+
+**الحل**:
+1. استخدم نموذجاً أصغر.
+2. قلل `contextLength`.
+3. فعّل تسريع GPU.
+
+### 10.3 الأخطاء في ملف config.json
+
+**الحل**:
+1. تحقق من صيغة JSON باستخدام مدقق JSON.
+2. تأكد من صحة أسماء النماذج.
+3. أعد تشغيل VS Code بعد التعديل.
+
+> **للمزيد**: راجع [دليل Continue.dev الشامل](/posts/continue-dev-guide) و [حل مشكلات ChatGPT الشائعة](/posts/chatgpt-common-problems).
+
+---
+
+## 11. الخلاصة
+
+إعدادات Continue.dev الصحيحة يمكن أن تحدث فرقاً كبيراً في تجربة البرمجة بالذكاء الاصطناعي. من خلال اختيار النماذج المناسبة، ضبط الإكمال التلقائي، تخصيص السياق، وتحسين الأداء، يمكنك تحقيق أقصى استفادة من هذه الأداة القوية.
+
+**الخلاصة في نقاط**:
+- **النماذج**: استخدم نموذجاً خفيفاً للإكمال التلقائي وثقيلاً للمحادثات.
+- **الإكمال التلقائي**: فعّل الإكمال المتعدد الأسطر وضبط سرعة الظهور.
+- **السياق**: فعّل سياق الكود الكامل والمحطة والمستندات.
+- **الاختصارات**: خصص اختصارات مريحة للوصول السريع.
+- **الأداء**: استخدم النماذج المحلية وقلل حجم السياق للأجهزة المحدودة.
+- **التخصيص**: استفد من الأوامر المخصصة لتحسين سير العمل.
+
+**توصيتنا**: ابدأ بملف الإعدادات المتكامل أعلاه وعدّله حسب احتياجاتك وجهازك. جرّب نماذج مختلفة واختر الأنسب لك.
+
+---
+
+## اقرأ أيضاً
+
+- [دليل Continue.dev الشامل](/posts/continue-dev-guide)
+- [تثبيت Continue.dev في VS Code](/posts/continue-installation)
+- [Continue مع Ollama: التشغيل المحلي](/posts/continue-ollama)
+- [Cursor أم Continue؟ مقارنة شاملة](/posts/cursor-vs-continue)
+- [تثبيت Ollama: دليل كامل](/posts/ollama-installation-guide)
+- [دليل Cursor AI الشامل 2026](/posts/cursor-ai-guide)
+- [أفضل أدوات البرمجة بالذكاء الاصطناعي](/posts/best-ai-coding-tools)
+- [ChatGPT للمبرمجين](/posts/chatgpt-for-programmers)
+
+---
+
+*ما هي إعدادات Continue المفضلة لديك؟ شاركنا تجربتك في التعليقات!*
