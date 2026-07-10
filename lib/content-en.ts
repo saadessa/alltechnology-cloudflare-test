@@ -4,10 +4,15 @@ import matter from "gray-matter";
 import readingTime from "reading-time";
 import { z } from "zod";
 import type { Post, TocItem } from "@/types/content";
-import { authorsEn, categoryLabelsEn } from "@/lib/site-en";
+import { authors, categories } from "@/lib/site";
 import { slugify, unique } from "@/lib/utils";
 
-const postsDirectory = path.join(process.cwd(), "content", "posts-en");
+const postsDirectory = path.join(process.cwd(), "content", "posts");
+
+/**
+ * Cache
+ */
+let postsCache: Post[] | undefined;
 
 const faqSchema = z.object({
   question: z.string().min(8),
@@ -26,32 +31,9 @@ const postSchema = z.object({
   featured: z.boolean().default(false),
   trending: z.boolean().default(false),
   draft: z.boolean().default(false),
-  arabicSlug: z.string().min(1).optional(),
+  englishSlug: z.string().min(1).optional(),
   faqs: z.array(faqSchema).default([])
 });
-
-export type EnglishCategory = {
-  slug: string;
-  name: string;
-  description: string;
-};
-
-export type EnglishAuthor = {
-  slug: string;
-  name: string;
-  role: string;
-  bio: string;
-  avatar: string;
-  sameAs: string[];
-};
-
-function humanizeSlug(slug: string) {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
 
 function extractToc(content: string): TocItem[] {
   const headingRegex = /^(##|###)\s+(.+)$/gm;
@@ -60,6 +42,7 @@ function extractToc(content: string): TocItem[] {
 
   while ((match = headingRegex.exec(content)) !== null) {
     const text = match[2].replace(/[#`*]/g, "").trim();
+
     toc.push({
       id: slugify(text),
       text,
@@ -70,7 +53,7 @@ function extractToc(content: string): TocItem[] {
   return toc;
 }
 
-export function getAllPostsEn(includeDrafts = false): Post[] {
+function loadPosts(): Post[] {
   if (!fs.existsSync(postsDirectory)) {
     return [];
   }
@@ -80,36 +63,46 @@ export function getAllPostsEn(includeDrafts = false): Post[] {
     .filter((file) => file.endsWith(".mdx"))
     .map((file) => {
       const source = fs.readFileSync(path.join(postsDirectory, file), "utf8");
+
       const { data, content } = matter(source);
+
       const parsed = postSchema.parse(data);
-      const slug = file.replace(/\.mdx$/, "");
 
       return {
-        slug,
+        slug: file.replace(/\.mdx$/, ""),
         ...parsed,
         content,
         readingTime: readingTime(content).text,
         toc: extractToc(content)
       };
     })
-    .filter((post) => includeDrafts || !post.draft)
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 }
 
-export function getPostBySlugEn(slug: string) {
-  return getAllPostsEn(true).find((post) => post.slug === slug && !post.draft);
+export function getAllPosts(includeDrafts = false): Post[] {
+  if (!postsCache) {
+    postsCache = loadPosts();
+  }
+
+  return includeDrafts
+    ? postsCache
+    : postsCache.filter((post) => !post.draft);
 }
 
-export function getFeaturedPostsEn(limit = 6) {
-  return getAllPostsEn().filter((post) => post.featured).slice(0, limit);
+export function getPostBySlug(slug: string) {
+  return getAllPosts(true).find((post) => post.slug === slug);
 }
 
-export function getTrendingPostsEn(limit = 6) {
-  return getAllPostsEn().filter((post) => post.trending).slice(0, limit);
+export function getFeaturedPosts(limit = 6) {
+  return getAllPosts().filter((post) => post.featured).slice(0, limit);
 }
 
-export function getRelatedPostsEn(post: Post, limit = 4) {
-  return getAllPostsEn()
+export function getTrendingPosts(limit = 6) {
+  return getAllPosts().filter((post) => post.trending).slice(0, limit);
+}
+
+export function getRelatedPosts(post: Post, limit = 4) {
+  return getAllPosts()
     .filter((item) => item.slug !== post.slug)
     .map((item) => ({
       post: item,
@@ -123,100 +116,34 @@ export function getRelatedPostsEn(post: Post, limit = 4) {
     .map((item) => item.post);
 }
 
-export function getPostsByCategoryEn(slug: string) {
-  return getAllPostsEn().filter((post) => slugify(post.category) === slug || post.category === slug);
+export function getPostsByCategory(slug: string) {
+  return getAllPosts().filter(
+    (post) => slugify(post.category) === slug || post.category === slug
+  );
 }
 
-export function getPostsByTagEn(slug: string) {
-  return getAllPostsEn().filter((post) => post.tags.some((tag) => slugify(tag) === slug));
+export function getPostsByTag(slug: string) {
+  return getAllPosts().filter((post) =>
+    post.tags.some((tag) => slugify(tag) === slug)
+  );
 }
 
-export function getPostsByAuthorEn(slug: string) {
-  return getAllPostsEn().filter((post) => slugify(post.author) === slug);
+export function getPostsByAuthor(slug: string) {
+  return getAllPosts().filter((post) => slugify(post.author) === slug);
 }
 
-export function getAllTagsEn() {
-  return unique(getAllPostsEn().flatMap((post) => post.tags)).sort((a, b) => a.localeCompare(b));
+export function getAllTags() {
+  return unique(getAllPosts().flatMap((post) => post.tags)).sort((a, b) =>
+    a.localeCompare(b)
+  );
 }
 
-export function getAllAuthorSlugsEn() {
-  return unique(getAllPostsEn().map((post) => slugify(post.author))).sort((a, b) => a.localeCompare(b));
+export function getCategory(slug: string) {
+  return categories.find((category) => category.slug === slug);
 }
 
-export function resolveCategoryEn(slug: string): EnglishCategory {
-  const label = categoryLabelsEn[slug as keyof typeof categoryLabelsEn];
-
-  if (label) {
-    return { slug, ...label };
-  }
-
-  const name = humanizeSlug(slug);
-
-  return {
-    slug,
-    name,
-    description: `Articles, guides, and analysis about ${name}.`
-  };
+export function getAuthor(slug: string) {
+  return authors.find((author) => author.slug === slug);
 }
 
-export function getCategoryEn(slug: string) {
-  const hasPosts = getPostsByCategoryEn(slug).length > 0;
-  const hasLabel = slug in categoryLabelsEn;
-
-  if (!hasPosts && !hasLabel) {
-    return null;
-  }
-
-  return resolveCategoryEn(slug);
-}
-
-export function getAllCategorySlugsEn() {
-  const postSlugs = unique(getAllPostsEn().map((post) => post.category));
-  const labelSlugs = Object.keys(categoryLabelsEn);
-  return unique([...labelSlugs, ...postSlugs]);
-}
-
-export function getCategoriesEn() {
-  return getAllCategorySlugsEn().map((slug) => resolveCategoryEn(slug));
-}
-
-export function getNavCategoriesEn(limit = 5) {
-  const posts = getAllPostsEn();
-
-  if (!posts.length) {
-    return getCategoriesEn().slice(0, limit);
-  }
-
-  const counts = new Map<string, number>();
-
-  for (const post of posts) {
-    counts.set(post.category, (counts.get(post.category) ?? 0) + 1);
-  }
-
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([slug]) => resolveCategoryEn(slug));
-}
-
-export function getAuthorEn(slug: string): EnglishAuthor | null {
-  const posts = getPostsByAuthorEn(slug);
-
-  if (!posts.length) {
-    return null;
-  }
-
-  const name = posts[0].author;
-  const enriched = authorsEn.find((author) => author.slug === slug || author.name === name);
-
-  return {
-    slug,
-    name,
-    role: enriched?.role ?? "Contributor",
-    bio: enriched?.bio ?? `${name} writes for AllTechnology.`,
-    avatar: enriched?.avatar ?? "/icon.svg",
-    sameAs: enriched?.sameAs ? [...enriched.sameAs] : []
-  };
-}
-
-export const POSTS_PER_PAGE_EN = 9;
+export const POSTS_PER_PAGE = 9;
