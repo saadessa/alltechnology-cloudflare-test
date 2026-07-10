@@ -9,6 +9,11 @@ import { slugify, unique } from "@/lib/utils";
 
 const postsDirectory = path.join(process.cwd(), "content", "posts");
 
+/**
+ * Cache
+ */
+let postsCache: Post[] | undefined;
+
 const faqSchema = z.object({
   question: z.string().min(8),
   answer: z.string().min(12)
@@ -37,6 +42,7 @@ function extractToc(content: string): TocItem[] {
 
   while ((match = headingRegex.exec(content)) !== null) {
     const text = match[2].replace(/[#`*]/g, "").trim();
+
     toc.push({
       id: slugify(text),
       text,
@@ -47,7 +53,7 @@ function extractToc(content: string): TocItem[] {
   return toc;
 }
 
-export function getAllPosts(includeDrafts = false): Post[] {
+function loadPosts(): Post[] {
   if (!fs.existsSync(postsDirectory)) {
     return [];
   }
@@ -57,24 +63,34 @@ export function getAllPosts(includeDrafts = false): Post[] {
     .filter((file) => file.endsWith(".mdx"))
     .map((file) => {
       const source = fs.readFileSync(path.join(postsDirectory, file), "utf8");
+
       const { data, content } = matter(source);
+
       const parsed = postSchema.parse(data);
-      const slug = file.replace(/\.mdx$/, "");
 
       return {
-        slug,
+        slug: file.replace(/\.mdx$/, ""),
         ...parsed,
         content,
         readingTime: readingTime(content).text,
         toc: extractToc(content)
       };
     })
-    .filter((post) => includeDrafts || !post.draft)
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 }
 
+export function getAllPosts(includeDrafts = false): Post[] {
+  if (!postsCache) {
+    postsCache = loadPosts();
+  }
+
+  return includeDrafts
+    ? postsCache
+    : postsCache.filter((post) => !post.draft);
+}
+
 export function getPostBySlug(slug: string) {
-  return getAllPosts(true).find((post) => post.slug === slug && !post.draft);
+  return getAllPosts(true).find((post) => post.slug === slug);
 }
 
 export function getFeaturedPosts(limit = 6) {
@@ -101,11 +117,15 @@ export function getRelatedPosts(post: Post, limit = 4) {
 }
 
 export function getPostsByCategory(slug: string) {
-  return getAllPosts().filter((post) => slugify(post.category) === slug || post.category === slug);
+  return getAllPosts().filter(
+    (post) => slugify(post.category) === slug || post.category === slug
+  );
 }
 
 export function getPostsByTag(slug: string) {
-  return getAllPosts().filter((post) => post.tags.some((tag) => slugify(tag) === slug));
+  return getAllPosts().filter((post) =>
+    post.tags.some((tag) => slugify(tag) === slug)
+  );
 }
 
 export function getPostsByAuthor(slug: string) {
@@ -113,7 +133,9 @@ export function getPostsByAuthor(slug: string) {
 }
 
 export function getAllTags() {
-  return unique(getAllPosts().flatMap((post) => post.tags)).sort((a, b) => a.localeCompare(b));
+  return unique(getAllPosts().flatMap((post) => post.tags)).sort((a, b) =>
+    a.localeCompare(b)
+  );
 }
 
 export function getCategory(slug: string) {
