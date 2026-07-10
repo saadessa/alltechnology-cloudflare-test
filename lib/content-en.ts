@@ -3,20 +3,22 @@ import path from "node:path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
 import { z } from "zod";
+
 import type { Post, TocItem } from "@/types/content";
 import { authors, categories } from "@/lib/site";
 import { slugify, unique } from "@/lib/utils";
 
 const postsDirectory = path.join(process.cwd(), "content", "posts");
 
-/**
- * Cache
- */
-let postsCache: Post[] | undefined;
+/* -------------------------------------------------------------------------- */
+/* Cache                                                                       */
+/* -------------------------------------------------------------------------- */
+
+let postsCache: Post[] | null = null;
 
 const faqSchema = z.object({
   question: z.string().min(8),
-  answer: z.string().min(12)
+  answer: z.string().min(12),
 });
 
 const postSchema = z.object({
@@ -32,21 +34,23 @@ const postSchema = z.object({
   trending: z.boolean().default(false),
   draft: z.boolean().default(false),
   englishSlug: z.string().min(1).optional(),
-  faqs: z.array(faqSchema).default([])
+  faqs: z.array(faqSchema).default([]),
 });
 
 function extractToc(content: string): TocItem[] {
-  const headingRegex = /^(##|###)\s+(.+)$/gm;
   const toc: TocItem[] = [];
+
+  const regex = /^(##|###)\s+(.+)$/gm;
+
   let match: RegExpExecArray | null;
 
-  while ((match = headingRegex.exec(content)) !== null) {
+  while ((match = regex.exec(content)) !== null) {
     const text = match[2].replace(/[#`*]/g, "").trim();
 
     toc.push({
       id: slugify(text),
       text,
-      depth: match[1].length
+      depth: match[1].length,
     });
   }
 
@@ -62,7 +66,10 @@ function loadPosts(): Post[] {
     .readdirSync(postsDirectory)
     .filter((file) => file.endsWith(".mdx"))
     .map((file) => {
-      const source = fs.readFileSync(path.join(postsDirectory, file), "utf8");
+      const source = fs.readFileSync(
+        path.join(postsDirectory, file),
+        "utf8"
+      );
 
       const { data, content } = matter(source);
 
@@ -73,10 +80,14 @@ function loadPosts(): Post[] {
         ...parsed,
         content,
         readingTime: readingTime(content).text,
-        toc: extractToc(content)
+        toc: extractToc(content),
       };
     })
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+    .sort(
+      (a, b) =>
+        Date.parse(b.publishedAt) -
+        Date.parse(a.publishedAt)
+    );
 }
 
 export function getAllPosts(includeDrafts = false): Post[] {
@@ -89,16 +100,22 @@ export function getAllPosts(includeDrafts = false): Post[] {
     : postsCache.filter((post) => !post.draft);
 }
 
-export function getPostBySlug(slug: string) {
-  return getAllPosts(true).find((post) => post.slug === slug);
+export function getPostBySlug(slug: string): Post | undefined {
+  return getAllPosts(true).find(
+    (post) => post.slug === slug && !post.draft
+  );
 }
 
 export function getFeaturedPosts(limit = 6) {
-  return getAllPosts().filter((post) => post.featured).slice(0, limit);
+  return getAllPosts()
+    .filter((post) => post.featured)
+    .slice(0, limit);
 }
 
 export function getTrendingPosts(limit = 6) {
-  return getAllPosts().filter((post) => post.trending).slice(0, limit);
+  return getAllPosts()
+    .filter((post) => post.trending)
+    .slice(0, limit);
 }
 
 export function getRelatedPosts(post: Post, limit = 4) {
@@ -108,7 +125,9 @@ export function getRelatedPosts(post: Post, limit = 4) {
       post: item,
       score:
         (item.category === post.category ? 3 : 0) +
-        item.tags.filter((tag) => post.tags.includes(tag)).length
+        item.tags.filter((tag) =>
+          post.tags.includes(tag)
+        ).length,
     }))
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score)
@@ -118,7 +137,9 @@ export function getRelatedPosts(post: Post, limit = 4) {
 
 export function getPostsByCategory(slug: string) {
   return getAllPosts().filter(
-    (post) => slugify(post.category) === slug || post.category === slug
+    (post) =>
+      slugify(post.category) === slug ||
+      post.category === slug
   );
 }
 
@@ -129,21 +150,31 @@ export function getPostsByTag(slug: string) {
 }
 
 export function getPostsByAuthor(slug: string) {
-  return getAllPosts().filter((post) => slugify(post.author) === slug);
-}
-
-export function getAllTags() {
-  return unique(getAllPosts().flatMap((post) => post.tags)).sort((a, b) =>
-    a.localeCompare(b)
+  return getAllPosts().filter(
+    (post) => slugify(post.author) === slug
   );
 }
 
+export function getAllTags() {
+  return unique(
+    getAllPosts().flatMap((post) => post.tags)
+  ).sort((a, b) => a.localeCompare(b));
+}
+
 export function getCategory(slug: string) {
-  return categories.find((category) => category.slug === slug);
+  return categories.find(
+    (category) => category.slug === slug
+  );
 }
 
 export function getAuthor(slug: string) {
-  return authors.find((author) => author.slug === slug);
+  return authors.find(
+    (author) => author.slug === slug
+  );
+}
+
+export function clearPostsCache() {
+  postsCache = null;
 }
 
 export const POSTS_PER_PAGE = 9;
