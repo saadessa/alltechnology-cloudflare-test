@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
-import rehypePrettyCode from "rehype-pretty-code";
+
 import { CheckCircle2 } from "lucide-react";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { ArticleCard } from "@/components/article/article-card";
