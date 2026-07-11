@@ -47,15 +47,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     options: {
       mdxOptions: {
         remarkPlugins: [remarkGfm],
-        rehypePlugins: [
-          rehypeSlug,
-          [
-            rehypePrettyCode,
-            {
-              theme: "github-dark"
-            }
-          ]
-        ]
+       rehypePlugins: [
+  rehypeSlug
+]
       }
     }
   });
