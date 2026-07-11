@@ -105,7 +105,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </header>
 
         <div className="relative mt-8 aspect-[16/8] overflow-hidden rounded-lg bg-slate-100">
-          <Image src={post.image} alt="" fill priority sizes="100vw" className="object-cover" />
+          <Image
+  src={post.image}
+  alt=""
+  fill
+  loading="lazy" sizes="100vw" className="object-cover" />
         </div>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
